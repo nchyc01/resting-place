@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>边框诊断测试</title>
+    <style>
+        body {
+            background: #1a0030;
+            color: #f0e6ff;
+            font-family: 'Microsoft YaHei', sans-serif;
+            padding: 20px;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #ff9cd6;
+            text-align: center;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 156, 214, 0.1);
+            border-radius: 10px;
+        }
+        
+        .test-window {
+            position: relative;
+            width: 400px;
+            height: 300px;
+            margin: 20px auto;
+            background: rgba(20, 10, 40, 0.95);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        /* 测试1: 原始边框 */
+        .test-original {
+            border: 1px solid rgba(255, 156, 214, 0.3);
+        }
+        
+        /* 测试2: 鲜艳红色边框 */
+        .test-red {
+            border: 3px solid red !important;
+        }
+        
+        /* 测试3: 加粗边框 */
+        .test-thick {
+            border: 5px solid #ff9cd6 !important;
+        }
+        
+        /* 测试4: 内外边框 */
+        .test-double {
+            border: 2px solid #ff9cd6;
+            outline: 2px solid rgba(255, 156, 214, 0.5);
+        }
+        
+        /* 测试5: 阴影边框 */
+        .test-shadow {
+            border: 1px solid rgba(255, 156, 214, 0.3);
+            box-shadow: 
+                0 0 0 1px rgba(255, 156, 214, 0.5),
+                inset 0 0 0 1px rgba(255, 156, 214, 0.5);
+        }
+        
+        .window-header {
+            height: 40px;
+            background: rgba(40, 20, 70, 0.9);
+            border-bottom: 1px solid rgba(255, 156, 214, 0.2);
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            color: #ff9cd6;
+            font-weight: bold;
+        }
+        
+        .window-content {
+            padding: 20px;
+            height: calc(100% - 40px);
+            overflow: auto;
+            color: #b8a2ff;
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+        
+        .test-btn {
+            padding: 8px 15px;
+            background: rgba(255, 156, 214, 0.2);
+            border: 1px solid rgba(255, 156, 214, 0.3);
+            border-radius: 5px;
+            color: #ff9cd6;
+            cursor: pointer;
+        }
+        
+        .test-btn:hover {
+            background: rgba(255, 156, 214, 0.3);
+        }
+        
+        .diagnostic-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        
+        .color-sample {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            margin: 0 5px;
+            border: 1px solid white;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>边框诊断测试</h1>
+        
+        <div class="test-section">
+            <h2>问题描述</h2>
+            <p>音乐播放器窗口下方边框显示不完整，即使窗口拉到最长也一样。</p>
+            <p>这可能是：边框被覆盖、边框颜色问题、渲染问题。</p>
+        </div>
+        
+        <div class="test-section">
+            <h2>边框颜色测试</h2>
+            <p>原始边框颜色: <span class="color-sample" style="background: rgba(255, 156, 214, 0.3);"></span> rgba(255, 156, 214, 0.3)</p>
+            
+            <div class="test-controls">
+                <button class="test-btn" onclick="applyTest('original')">原始边框</button>
+                <button class="test-btn" onclick="applyTest('red')">红色边框</button>
+                <button class="test-btn" onclick="applyTest('thick')">加粗边框</button>
+                <button class="test-btn" onclick="applyTest('double')">内外边框</button>
+                <button class="test-btn" onclick="applyTest('shadow')">阴影边框</button>
+            </div>
+            
+            <div class="test-window test-original" id="test-window">
+                <div class="window-header">
+                    测试窗口 - 边框诊断
+                </div>
+                <div class="window-content">
+                    <h3>窗口内容区域</h3>
+                    <p>这是一个测试窗口，用于诊断边框显示问题。</p>
+                    <p>如果下方边框显示不完整，可能是：</p>
+                    <ul>
+                        <li>边框被内容覆盖</li>
+                        <li>边框颜色太浅</li>
+                        <li>边框位置错误</li>
+                        <li>浏览器渲染问题</li>
+                    </ul>
+                    <p>尝试不同的边框样式，看看哪种能完整显示。</p>
+                </div>
+            </div>
+            
+            <div class="diagnostic-info" id="diagnostic-info">
+                当前: 原始边框 (rgba(255, 156, 214, 0.3))
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>CSS盒模型检查</h2>
+            <div class="diagnostic-info">
+                <p><strong>.window 边框CSS:</strong> <code>border: 1px solid rgba(255, 156, 214, 0.3);</code></p>
+                <p><strong>.window-content 高度:</strong> <code>height: calc(100% - 40px);</code> (100%窗口高度 - 40px标题栏)</p>
+                <p><strong>.window-content padding:</strong> <code>padding: 20px;</code></p>
+                <p><strong>问题假设:</strong> 如果内容区域高度计算错误，可能覆盖底部边框。</p>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>高度计算测试</h2>
+            <div class="test-controls">
+                <button class="test-btn" onclick="testHeight('calc(100% - 40px)')">原始: calc(100% - 40px)</button>
+                <button class="test-btn" onclick="testHeight('calc(100% - 45px)')">测试: calc(100% - 45px)</button>
+                <button class="test-btn" onclick="testHeight('calc(100% - 50px)')">测试: calc(100% - 50px)</button>
+                <button class="test-btn" onclick="testHeight('calc(100% - 60px)')">测试: calc(100% - 60px)</button>
+            </div>
+            <div class="diagnostic-info" id="height-info">
+                当前: calc(100% - 40px)
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>诊断结果</h2>
+            <div class="diagnostic-info">
+                <p id="result-text">等待测试...</p>
+                <p><strong>请反馈:</strong> 哪种边框样式能完整显示？高度调整是否有帮助？</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const testWindow = document.getElementById('test-window');
+        const diagnosticInfo = document.getElementById('diagnostic-info');
+        const heightInfo = document.getElementById('height-info');
+        const resultText = document.getElementById('result-text');
+        
+        // 边框样式测试
+        function applyTest(testType) {
+            // 移除所有测试类
+            testWindow.className = 'test-window';
+            
+            // 添加对应的测试类
+            switch(testType) {
+                case 'original':
+                    testWindow.classList.add('test-original');
+                    diagnosticInfo.innerHTML = '当前: 原始边框 (rgba(255, 156, 214, 0.3))';
+                    break;
+                case 'red':
+                    testWindow.classList.add('test-red');
+                    diagnosticInfo.innerHTML = '当前: 红色边框 (3px solid red)';
+                    break;
+                case 'thick':
+                    testWindow.classList.add('test-thick');
+                    diagnosticInfo.innerHTML = '当前: 加粗边框 (5px solid #ff9cd6)';
+                    break;
+                case 'double':
+                    testWindow.classList.add('test-double');
+                    diagnosticInfo.innerHTML = '当前: 内外边框';
+                    break;
+                case 'shadow':
+                    testWindow.classList.add('test-shadow');
+                    diagnosticInfo.innerHTML = '当前: 阴影边框';
+                    break;
+            }
+            
+            updateResult();
+        }
+        
+        // 高度计算测试
+        function testHeight(heightValue) {
+            const content = testWindow.querySelector('.window-content');
+            if (content) {
+                content.style.height = heightValue;
+                heightInfo.innerHTML = `当前: ${heightValue}`;
+                updateResult();
+            }
+        }
+        
+        // 更新诊断结果
+        function updateResult() {
+            const borderStyle = window.getComputedStyle(testWindow).borderBottom;
+            const contentHeight = window.getComputedStyle(testWindow.querySelector('.window-content')).height;
+            
+            resultText.innerHTML = `
+                <strong>边框样式:</strong> ${borderStyle}<br>
+                <strong>内容高度:</strong> ${contentHeight}<br>
+                <strong>窗口高度:</strong> ${window.getComputedStyle(testWindow).height}
+            `;
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateResult();
+            console.log('边框诊断测试已加载');
+            console.log('测试说明:');
+            console.log('1. 点击不同边框样式按钮，观察边框显示');
+            console.log('2. 点击高度计算按钮，测试不同高度');
+            console.log('3. 反馈哪种设置能让边框完整显示');
+        });
+    </script>
+</body>
+</html>

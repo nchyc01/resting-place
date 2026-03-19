@@ -1,0 +1,59 @@
+/* 短边框测试 - 临时添加到style.css末尾 */
+
+/* 测试1: 只显示1px高度的底部边框 */
+#music-window {
+    border: none !important;
+    border-bottom: 5px solid red !important; /* 5px红色，明显可见 */
+    position: relative;
+}
+
+/* 测试2: 添加视觉标记 */
+#music-window::after {
+    content: '底部边框测试 - 5px红色';
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: black;
+    color: white;
+    padding: 2px 5px;
+    font-size: 12px;
+    border-radius: 3px;
+    white-space: nowrap;
+    z-index: 10000;
+}
+
+/* 测试3: 测试不同位置的短边框 */
+.border-test-1 {
+    border-bottom: 5px solid red !important;
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+}
+
+.border-test-2 {
+    border-bottom: 10px solid #00ff00 !important;
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+}
+
+.border-test-3 {
+    border-bottom: 3px solid blue !important;
+    border-top: 3px solid yellow !important;
+    border-left: none !important;
+    border-right: none !important;
+}
+
+/* 测试4: 使用outline作为边框 */
+.outline-test {
+    outline: 5px solid purple !important;
+    outline-offset: -5px !important;
+    border: none !important;
+}
+
+/* 测试5: 使用box-shadow作为边框 */
+.shadow-test {
+    box-shadow: 0 0 0 5px orange !important;
+    border: none !important;
+}

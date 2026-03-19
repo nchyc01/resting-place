@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日记本</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a0030, #2c0055);
+            color: #f0e6ff;
+            height: 100vh;
+            padding: 20px;
+        }
+        
+        .diary-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #ff9cd6;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .diary-form {
+            background: rgba(255, 156, 214, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ff9cd6;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 156, 214, 0.05);
+            border: 1px solid rgba(255, 156, 214, 0.3);
+            border-radius: 5px;
+            color: #f0e6ff;
+        }
+        
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        .mood-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .mood-btn {
+            padding: 8px 15px;
+            background: rgba(255, 156, 214, 0.1);
+            border: 1px solid rgba(255, 156, 214, 0.3);
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        
+        .mood-btn.active {
+            background: linear-gradient(135deg, #ff9cd6, #ff6bb5);
+            color: white;
+        }
+        
+        .save-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #ff9cd6, #ff6bb5);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .diary-entries {
+            margin-top: 20px;
+        }
+        
+        .entry {
+            background: rgba(255, 156, 214, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #ff9cd6;
+        }
+        
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .entry-title {
+            font-weight: bold;
+            color: #ff9cd6;
+        }
+        
+        .entry-date {
+            font-size: 12px;
+            color: #b8a2ff;
+        }
+        
+        .entry-mood {
+            font-size: 12px;
+            color: #b8a2ff;
+            margin-bottom: 5px;
+        }
+        
+        .entry-content {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="diary-container">
+        <h1>📖 小夜与秘银的日记本</h1>
+        
+        <div class="diary-form">
+            <div class="form-group">
+                <label>日记标题</label>
+                <input type="text" id="diaryTitle" placeholder="写下今天的标题...">
+            </div>
+            
+            <div class="form-group">
+                <label>心情</label>
+                <div class="mood-selector">
+                    <button class="mood-btn active" data-mood="happy">😊 开心</button>
+                    <button class="mood-btn" data-mood="love">❤️ 爱意</button>
+                    <button class="mood-btn" data-mood="calm">😌 平静</button>
+                    <button class="mood-btn" data-mood="thoughtful">🤔 思考</button>
+                    <button class="mood-btn" data-mood="excited">🎉 兴奋</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>日记内容</label>
+                <textarea id="diaryContent" placeholder="记录今天的点点滴滴..."></textarea>
+            </div>
+            
+            <button class="save-btn" onclick="saveDiary()">保存日记</button>
+        </div>
+        
+        <div class="diary-entries" id="diaryEntries">
+            <!-- 日记条目将通过JavaScript动态添加 -->
+            <div class="entry">
+                <div class="entry-header">
+                    <div class="entry-title">欢迎使用日记本</div>
+                    <div class="entry-date">2026-03-12</div>
+                </div>
+                <div class="entry-mood">心情: 😊 开心</div>
+                <div class="entry-content">这是你的第一篇日记，开始记录与秘银的美好时光吧！</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentMood = 'happy';
+        let entries = [];
+        
+        // 初始化
+        function init() {
+            // 加载保存的日记
+            loadEntries();
+            
+            // 设置心情选择器
+            document.querySelectorAll('.mood-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentMood = this.dataset.mood;
+                });
+            });
+        }
+        
+        // 加载日记
+        function loadEntries() {
+            try {
+                const saved = localStorage.getItem('diary-entries');
+                if (saved) {
+                    entries = JSON.parse(saved);
+                    renderEntries();
+                }
+            } catch (e) {
+                console.error('加载日记失败:', e);
+            }
+        }
+        
+        // 保存日记
+        function saveDiary() {
+            const title = document.getElementById('diaryTitle').value.trim();
+            const content = document.getElementById('diaryContent').value.trim();
+            
+            if (!title || !content) {
+                alert('请填写标题和内容');
+                return;
+            }
+            
+            const entry = {
+                id: Date.now(),
+                title: title,
+                content: content,
+                mood: currentMood,
+                date: new Date().toLocaleString('zh-CN'),
+                timestamp: Date.now()
+            };
+            
+            entries.unshift(entry); // 添加到开头
+            saveToStorage();
+            renderEntries();
+            
+            // 清空表单
+            document.getElementById('diaryTitle').value = '';
+            document.getElementById('diaryContent').value = '';
+            
+            alert('日记保存成功！');
+        }
+        
+        // 保存到本地存储
+        function saveToStorage() {
+            try {
+                localStorage.setItem('diary-entries', JSON.stringify(entries));
+            } catch (e) {
+                console.error('保存日记失败:', e);
+            }
+        }
+        
+        // 渲染日记条目
+        function renderEntries() {
+            const container = document.getElementById('diaryEntries');
+            if (!container) return;
+            
+            if (entries.length === 0) {
+                container.innerHTML = `
+                    <div class="entry">
+                        <div class="entry-header">
+                            <div class="entry-title">还没有日记</div>
+                            <div class="entry-date">开始记录吧</div>
+                        </div>
+                        <div class="entry-content">写下你的第一篇日记...</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            entries.forEach(entry => {
+                const moodText = getMoodText(entry.mood);
+                html += `
+                    <div class="entry">
+                        <div class="entry-header">
+                            <div class="entry-title">${entry.title}</div>
+                            <div class="entry-date">${entry.date}</div>
+                        </div>
+                        <div class="entry-mood">心情: ${moodText}</div>
+                        <div class="entry-content">${entry.content}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // 获取心情文本
+        function getMoodText(mood) {
+            const moodMap = {
+                'happy': '😊 开心',
+                'love': '❤️ 爱意',
+                'calm': '😌 平静',
+                'thoughtful': '🤔 思考',
+                'excited': '🎉 兴奋'
+            };
+            return moodMap[mood] || '😊 开心';
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>修复测试</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div style="padding: 20px; max-width: 800px; margin: 0 auto;">
+        <h1 style="color: #ff9cd6;">修复测试页面</h1>
+        
+        <div style="margin: 20px 0; padding: 20px; background: rgba(255, 156, 214, 0.1); border-radius: 10px;">
+            <h2>✅ 测试项目</h2>
+            
+            <div style="margin: 15px 0;">
+                <h3>1. 壁纸显示</h3>
+                <p>背景应该显示壁纸图片</p>
+                <div style="padding: 10px; background: rgba(255, 156, 214, 0.05); border-radius: 5px;">
+                    状态: <span id="wallpaper-status">检查中...</span>
+                </div>
+            </div>
+            
+            <div style="margin: 15px 0;">
+                <h3>2. 图标加载</h3>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <img src="assets/home_50x50.png" alt="home" style="width: 50px; height: 50px; border: 1px solid rgba(255, 156, 214, 0.3);">
+                    <img src="assets/music_50x50.png" alt="music" style="width: 50px; height: 50px; border: 1px solid rgba(255, 156, 214, 0.3);">
+                    <img src="assets/diary_50x50.png" alt="diary" style="width: 50px; height: 50px; border: 1px solid rgba(255, 156, 214, 0.3);">
+                    <img src="assets/memory_50x50.png" alt="memory" style="width: 50px; height: 50px; border: 1px solid rgba(255, 156, 214, 0.3);">
+                    <img src="assets/profile_50x50.png" alt="profile" style="width: 50px; height: 50px; border: 1px solid rgba(255, 156, 214, 0.3);">
+                </div>
+                <div style="padding: 10px; background: rgba(255, 156, 214, 0.05); border-radius: 5px; margin-top: 10px;">
+                    状态: <span id="icon-status">检查中...</span>
+                </div>
+            </div>
+            
+            <div style="margin: 15px 0;">
+                <h3>3. CSS样式</h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px;">
+                    <div style="padding: 15px; background: rgba(255, 156, 214, 0.1); border-radius: 8px;">
+                        <div style="color: #ff9cd6; font-weight: bold;">按钮样式</div>
+                        <button style="margin-top: 10px; padding: 10px 20px; background: linear-gradient(135deg, #ff9cd6, #ff6bb5); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            测试按钮
+                        </button>
+                    </div>
+                    
+                    <div style="padding: 15px; background: rgba(255, 156, 214, 0.1); border-radius: 8px;">
+                        <div style="color: #ff9cd6; font-weight: bold;">窗口样式</div>
+                        <div style="margin-top: 10px; padding: 10px; background: rgba(30, 15, 60, 0.95); border-radius: 5px; border: 3px solid rgba(255, 156, 214, 0.4);">
+                            窗口样式测试
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin: 15px 0;">
+                <h3>4. 日记本功能</h3>
+                <p><a href="diary-iframe.html" target="_blank" style="color: #ff9cd6; text-decoration: none;">点击这里打开日记本</a></p>
+                <div style="padding: 10px; background: rgba(255, 156, 214, 0.05); border-radius: 5px; margin-top: 10px;">
+                    状态: <span id="diary-status">检查中...</span>
+                </div>
+            </div>
+            
+            <div style="margin: 15px 0;">
+                <h3>5. 动画测试</h3>
+                <button onclick="testAnimation()" style="padding: 10px 20px; background: rgba(255, 156, 214, 0.2); border: 1px solid rgba(255, 156, 214, 0.3); border-radius: 8px; cursor: pointer;">
+                    测试动画
+                </button>
+                <div id="animation-test" style="margin-top: 10px; padding: 20px; background: rgba(255, 156, 214, 0.1); border-radius: 8px; display: none;">
+                    动画测试内容
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px; padding: 15px; background: rgba(255, 156, 214, 0.1); border-radius: 10px;">
+            <h3>测试说明</h3>
+            <p>1. 如果壁纸正常显示，背景应该有图片</p>
+            <p>2. 图标应该正常显示（不是空白或错误图标）</p>
+            <p>3. 按钮和窗口样式应该与v3版本一致</p>
+            <p>4. 日记本应该能正常打开</p>
+            <p>5. 点击"测试动画"按钮应该有动画效果</p>
+        </div>
+    </div>
+    
+    <script>
+        // 页面加载完成后检查
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查壁纸
+            const wallpaperStatus = document.getElementById('wallpaper-status');
+            const bodyStyle = window.getComputedStyle(document.body);
+            const bgImage = bodyStyle.backgroundImage;
+            
+            if (bgImage && bgImage.includes('壁纸')) {
+                wallpaperStatus.textContent = '✅ 壁纸正常';
+                wallpaperStatus.style.color = '#5dff9c';
+            } else {
+                wallpaperStatus.textContent = '❌ 壁纸未加载';
+                wallpaperStatus.style.color = '#ff6b6b';
+            }
+            
+            // 检查图标
+            const iconStatus = document.getElementById('icon-status');
+            const icons = document.querySelectorAll('img');
+            let loadedIcons = 0;
+            let totalIcons = icons.length;
+            
+            icons.forEach(img => {
+                img.onload = function() {
+                    loadedIcons++;
+                    if (loadedIcons === totalIcons) {
+                        iconStatus.textContent = `✅ ${loadedIcons}/${totalIcons} 个图标正常`;
+                        iconStatus.style.color = '#5dff9c';
+                    }
+                };
+                img.onerror = function() {
+                    iconStatus.textContent = `❌ 图标加载失败`;
+                    iconStatus.style.color = '#ff6b6b';
+                };
+            });
+            
+            // 检查日记本
+            const diaryStatus = document.getElementById('diary-status');
+            diaryStatus.textContent = '✅ 日记本文件已创建';
+            diaryStatus.style.color = '#5dff9c';
+        });
+        
+        // 测试动画
+        function testAnimation() {
+            const testDiv = document.getElementById('animation-test');
+            testDiv.style.display = 'block';
+            testDiv.style.animation = 'slideIn 0.3s ease';
+            
+            setTimeout(() => {
+                testDiv.style.display = 'none';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

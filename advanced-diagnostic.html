@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高级布局诊断工具</title>
+    <style>
+        body {
+            background: #1a0030;
+            color: #f0e6ff;
+            font-family: 'Microsoft YaHei', sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .diagnostic-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #ff9cd6;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .diagnostic-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 156, 214, 0.1);
+            border-radius: 10px;
+        }
+        
+        .control-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .control-group {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .control-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(255, 156, 214, 0.2);
+            border: 1px solid rgba(255, 156, 214, 0.3);
+            border-radius: 5px;
+            color: #ff9cd6;
+            cursor: pointer;
+            text-align: left;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 156, 214, 0.3);
+        }
+        
+        .measurement-results {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .element-path {
+            color: #ff9cd6;
+            font-weight: bold;
+        }
+        
+        .dimension-value {
+            color: #00ff00;
+        }
+        
+        .problem-value {
+            color: #ff5555;
+            font-weight: bold;
+        }
+        
+        .solution-value {
+            color: #55aaff;
+            font-weight: bold;
+        }
+        
+        .visual-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 99999;
+            display: none;
+        }
+        
+        .overlay-element {
+            position: absolute;
+            border: 2px solid;
+            background: rgba(255, 255, 255, 0.05);
+            box-sizing: border-box;
+        }
+        
+        .overlay-label {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 3px 6px;
+            font-size: 11px;
+            border-radius: 3px;
+            white-space: nowrap;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+        
+        .color-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .color-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .color-box {
+            width: 15px;
+            height: 15px;
+            border: 1px solid white;
+        }
+        
+        .export-panel {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .export-textarea {
+            width: 100%;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.5);
+            color: #00ff00;
+            border: 1px solid rgba(255, 156, 214, 0.3);
+            border-radius: 5px;
+            padding: 10px;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <div class="diagnostic-container">
+        <h1>高级布局诊断工具</h1>
+        
+        <div class="diagnostic-section">
+            <h2>问题：内部容器超出外部边框</h2>
+            <p>即使窗口高度增加到650px，问题仍然存在。需要根本性诊断。</p>
+        </div>
+        
+        <div class="control-panel">
+            <div class="control-group">
+                <h3>测量功能</h3>
+                <button class="control-btn" onclick="measureMusicWindow()">测量音乐窗口</button>
+                <button class="control-btn" onclick="measureAllElements()">测量所有元素</button>
+                <button class="control-btn" onclick="calculateOverflow()">计算溢出量</button>
+                <button class="control-btn" onclick="analyzeLayout()">分析布局结构</button>
+            </div>
+            
+            <div class="control-group">
+                <h3>可视化</h3>
+                <button class="control-btn" onclick="toggleOverlay('window')">显示窗口轮廓</button>
+                <button class="control-btn" onclick="toggleOverlay('content')">显示内容区域</button>
+                <button class="control-btn" onclick="toggleOverlay('containers')">显示内部容器</button>
+                <button class="control-btn" onclick="toggleOverlay('all')">显示所有元素</button>
+                <button class="control-btn" onclick="hideOverlay()">隐藏轮廓</button>
+            </div>
+            
+            <div class="control-group">
+                <h3>修复测试</h3>
+                <button class="control-btn" onclick="testFix('remove-height')">移除固定高度</button>
+                <button class="control-btn" onclick="testFix('flex-grow')">使用flex-grow</button>
+                <button class="control-btn" onclick="testFix('grid-auto')">使用grid-auto</button>
+                <button class="control-btn" onclick="testFix('overflow-auto')">允许溢出滚动</button>
+                <button class="control-btn" onclick="resetStyles()">重置样式</button>
+            </div>
+        </div>
+        
+        <div class="color-legend">
+            <div class="color-item">
+                <div class="color-box" style="background: rgba(255, 0, 0, 0.3); border-color: red;"></div>
+                <span>窗口边框</span>
+            </div>
+            <div class="color-item">
+                <div class="color-box" style="background: rgba(0, 255, 0, 0.3); border-color: #00ff00;"></div>
+                <span>内容区域</span>
+            </div>
+            <div class="color-item">
+                <div class="color-box" style="background: rgba(0, 0, 255, 0.3); border-color: blue;"></div>
+                <span>内部容器</span>
+            </div>
+            <div class="color-item">
+                <div class="color-box" style="background: rgba(255, 255, 0, 0.3); border-color: yellow;"></div>
+                <span>溢出区域</span>
+            </div>
+        </div>
+        
+        <div class="measurement-results" id="measurement-results">
+            点击测量按钮开始诊断...
+        </div>
+        
+        <div class="export-panel">
+            <h3>诊断报告导出</h3>
+            <textarea class="export-textarea" id="export-textarea" readonly>诊断报告将显示在这里...</textarea>
+            <button class="control-btn" onclick="exportReport()">导出报告</button>
+            <button class="control-btn" onclick="copyReport()">复制报告</button>
+        </div>
+        
+        <div class="diagnostic-section">
+            <h2>可能的问题根源</h2>
+            <div class="measurement-results">
+                <p><span class="problem-value">1. 高度继承链断裂</span>: 父元素没有明确高度，导致百分比高度失效</p>
+                <p><span class="problem-value">2. flex/grid布局冲突</span>: 多个布局系统混合导致计算错误</p>
+                <p><span class="problem-value">3. 边框/边距计算</span>: box-sizing或margin导致尺寸超出预期</p>
+                <p><span class="problem-value">4. 滚动条占用空间</span>: overflow: auto/scroll占用内容空间</p>
+                <p><span class="solution-value">解决方案</span>: 需要精确测量每个环节的尺寸</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="visual-overlay" id="visual-overlay"></div>
+    
+    <script>
+        const measurementResults = document.getElementById('measurement-results');
+        const exportTextarea = document.getElementById('export-textarea');
+        const visualOverlay = document.getElementById('visual-overlay');
+        let currentOverlay = null;
+        let diagnosticData = {};
+        
+        // 测量音乐窗口
+        function measureMusicWindow() {
+            try {
+                const musicWindow = window.opener ? 
+                    window.opener.document.getElementById('music-window') : 
+                    null;
+                    
+                if (!musicWindow) {
+                    measurementResults.innerHTML = '<span class="problem-value">错误: 无法访问音乐窗口。请在新标签页打开原页面。</span>';
+                    return;
+                }
+                
+                diagnosticData = {};
+                const elements = [
+                    { id: 'music-window', name: '音乐窗口' },
+                    { selector: '.window-content', name: '内容区域' },
+                    { selector: '.music-player-container', name: '音乐播放器容器' },
+                    { selector: '.player-main', name: '主区域网格' },
+                    { selector: '.now-playing', name: '当前播放区域' },
+                    { selector: '.playlist-section', name: '播放列表区域' },
+                    { selector: '.playlist-items', name: '播放列表项容器' }
+                ];
+                
+                let html = '<h3>音乐窗口详细测量</h3>';
+                const report = [];
+                
+                elements.forEach(element => {
+                    const el = element.id ? 
+                        window.opener.document.getElementById(element.id) :
+                        musicWindow.querySelector(element.selector);
+                        
+                    if (el) {
+                        const rect = el.getBoundingClientRect();
+                        const computedStyle = window.opener.getComputedStyle(el);
+                        
+                        const data = {
+                            name: element.name,
+                            width: rect.width,
+                            height: rect.height,
+                            top: rect.top,
+                            bottom: rect.bottom,
+                            left: rect.left,
+                            right: rect.right,
+                            marginTop: computedStyle.marginTop,
+                            marginBottom: computedStyle.marginBottom,
+                            paddingTop: computedStyle.paddingTop,
+                            paddingBottom: computedStyle.paddingBottom,
+                            borderTopWidth: computedStyle.borderTopWidth,
+                            borderBottomWidth: computedStyle.borderBottomWidth,
+                            boxSizing: computedStyle.boxSizing,
+                            overflow: computedStyle.overflow,
+                            display: computedStyle.display
+                        };
+                        
+                        diagnosticData[element.name] = data;
+                        
+                        html += `
+                            <div style="margin: 10px 0; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 5px;">
+                                <span class="element-path">${element.name}</span><br>
+                                尺寸: <span class="dimension-value">${Math.round(rect.width)}px × ${Math.round(rect.height)}px</span><br>
+                                位置: top=${Math.round(rect.top)}px, bottom=${Math.round(rect.bottom)}px<br>
+                                边距: ${computedStyle.marginTop} ${computedStyle.marginBottom}<br>
+                                内边距: ${computedStyle.paddingTop} ${computedStyle.paddingBottom}<br>
+                                边框: ${computedStyle.borderTopWidth} ${computedStyle.borderBottomWidth}<br>
+                                布局: ${computedStyle.display}, overflow: ${computedStyle.overflow}
+                            </div>
+                        `;
+                        
+                        report.push(`${element.name}: ${Math.round(rect.width)}px × ${Math.round(rect.height)}px (top:${Math.round(rect.top)}px, bottom:${Math.round(rect.bottom)}px)`);
+                    }
+                });
+                
+                // 计算溢出
+                const windowRect = diagnosticData['音乐窗口'];
+                const contentRect = diagnosticData['内容区域'];
+                
+                if (windowRect && contentRect) {
+                    const windowBottom = windowRect.top + windowRect.height;
+                    const contentBottom = contentRect.top + contentRect.height;
+                    const overflow = contentBottom - windowBottom;
+                    
+                    if (overflow > 0) {
+                        html += `<div style="margin: 15px 0; padding: 10px; background: rgba(255,0,0,0.2); border-radius: 5px;">
+                            <span class="problem-value">⚠️ 检测到溢出!</span><br>
+                            内容底部超出窗口底部: <span class="problem-value">${Math.round(overflow)}px</span><br>
+                            窗口底部: ${Math.round(windowBottom)}px<br>
+                            内容底部: ${Math.round(contentBottom)}px
+                        </div>`;
+                        
+                        report.push(`溢出检测: 内容超出窗口底部 ${Math.round(overflow)}px`);
+                    }
+                }
+                
+                measurementResults.innerHTML = html;
+                exportTextarea.value = report.join('\n');
+                
+            } catch (error) {
+                measurementResults.innerHTML = `<span class="problem-value">测量错误: ${error.message}</span>`;
+            }
+        }
+        
+        // 测量所有元素
+        function measureAllElements() {
+            // 简化版本，实际需要遍历DOM树
+            measurementResults.innerHTML = '正在测量所有元素...<br>请先使用"测量音乐窗口"功能';
+        }
+        
+        // 计算溢出量
+        function calculateOverflow() {
+            if (!diagnosticData['音乐窗口'] || !diagnosticData['内容区域']) {
+                measurementResults.innerHTML = '<span class="problem-value">请先使用"测量音乐窗口"功能</span>';
+                return;
+            }
+            
+            const windowData = diagnosticData['音乐窗口'];
+            const contentData = diagnosticData['内容区域'];
+            
+            const windowHeight = windowData.height;
+            const contentHeight = contentData.height;
+            const windowBottom = windowData.top + windowData.height;
+            const contentBottom = contentData.top + contentData.height;
+            
+            const overflow = contentBottom - windowBottom;
+            const heightDifference = contentHeight - windowHeight;
+            
+            let html = '<h3>溢出计算分析</h3>';
+            html += `<p>窗口高度: <span class="dimension-value">${Math.round(windowHeight)}px</span></p>`;
+            html += `<p>内容高度: <span class="dimension-value">${Math.round(contentHeight)}px</span></p>`;
+            html += `<p>高度差异: <span class="${heightDifference > 0 ? 'problem-value' : 'dimension-value'}">${Math.round(heightDifference)}px</span></p>`;
+            html += `<p>实际溢出: <span class="${overflow > 0 ? 'problem-value' : 'dimension-value'}">${Math.round(overflow)}px</span></p>`;
+            
+            if (overflow > 0) {
+                html += `<div style="margin: 15px 0; padding: 10px; background: rgba(255,0,0,0.2); border-radius: 5px;">
+                    <span class="problem-value">⚠️ 溢出分析</span><br>
+                    内容超出窗口: ${Math.round(overflow)}px<br>
+                    可能需要: 增加窗口高度 ${Math.round(overflow + 20)}px 或减少内容高度
+                </div>`;
+            }
+            
+            measurementResults.innerHTML = html;
+        }
+        
+        // 分析布局结构
+        function analyzeLayout() {
+            let html = '<h3>布局结构分析</h3>';
+            
+            html += `<p><span class="problem-value">可能的问题:</span></p>`;
+            html += `<ol>
+                <li><strong>高度继承链</strong>: 检查父元素是否有明确高度</li>
+                <li><strong>flex/grid冲突</strong>: 混合布局可能导致计算错误</li>
+                <li><strong>边框边距</strong>: box-sizing: border-box 是否一致</li>
+                <li><strong>滚动条空间</strong>: overflow 属性是否占用内容空间</li>
+            </ol>`;
+            
+            html += `<p><span class="solution-value">建议的修复步骤:</span></p>`;
+            html += `<ol>
+                <li>确保所有父元素都有明确高度</li>
+                <li>统一使用 box-sizing: border-box</li>
+                <li>避免混合 flex 和 grid 布局</li>
+                <li>考虑使用 min-height 而不是 height</li>
+                <li>测试移除所有固定高度，使用自适应布局</li>
+            </ol>`;
+            
+            measurementResults.innerHTML = html;
+        }
+        
+        // 可视化轮廓
+        function toggleOverlay(type) {
+            try {
+                const musicWindow = window.opener ? 
+                    window.opener.document.getElementById('music-window') : 
+                    null;
+                    
+                if (!musicWindow) {
+                    alert('请在新标签页打开原页面');
+                    return;
+                }
+                
+                visualOverlay.innerHTML = '';
+                visualOverlay.style.display = 'block';
+                currentOverlay = type;
+                
+                const colors = {
+                    'window': { border: '

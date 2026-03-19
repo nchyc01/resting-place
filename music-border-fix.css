@@ -1,0 +1,42 @@
+/* 音乐播放器边框修复 - 临时测试 */
+/* 将此CSS添加到style.css中测试 */
+
+/* 修复1: 移除.music-player-container的滚动条 */
+.music-player-container {
+    overflow-y: hidden !important; /* 临时测试 */
+}
+
+/* 修复2: 增加.playlist-items的最大高度 */
+.playlist-items {
+    max-height: 450px !important; /* 增加高度 */
+}
+
+/* 修复3: 确保.player-main不溢出 */
+.player-main {
+    min-height: 0;
+    overflow: hidden !important;
+}
+
+/* 修复4: 临时突出显示边框 */
+.window#music-window {
+    border: 3px solid red !important; /* 临时测试边框 */
+}
+
+/* 修复5: 检查内容高度 */
+.window-content#music-window-content {
+    box-sizing: border-box;
+    height: calc(100% - 40px) !important;
+}
+
+/* 修复6: 如果还有问题，尝试减少padding */
+.music-player-container {
+    padding: 20px !important; /* 减少padding */
+}
+
+/* 修复7: 确保网格布局正确 */
+.player-main {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 20px !important; /* 减少间距 */
+    flex: 1 !important;
+}

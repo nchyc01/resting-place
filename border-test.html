@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>边框测试 - 辅助框</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 辅助框样式 */
+        .border-guide {
+            position: absolute;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        
+        .guide-5px {
+            border: 1px solid red;
+            outline: 4px solid rgba(255, 0, 0, 0.3);
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+        }
+        
+        .guide-10px {
+            border: 1px solid blue;
+            outline: 4px solid rgba(0, 0, 255, 0.3);
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+        }
+        
+        .guide-15px {
+            border: 1px solid green;
+            outline: 4px solid rgba(0, 255, 0, 0.3);
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+        }
+        
+        .guide-label {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 2px 5px;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+        
+        .test-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 10000;
+        }
+        
+        .test-controls button {
+            margin: 5px;
+            padding: 5px 10px;
+            background: #ff9cd6;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .padding-test {
+            position: fixed;
+            top: 100px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 10000;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-controls">
+        <h3 style="color: white; margin: 0 0 10px 0;">边框测试控制</h3>
+        <button onclick="toggleGuide('guide-5px')">切换5px红色框</button>
+        <button onclick="toggleGuide('guide-10px')">切换10px蓝色框</button>
+        <button onclick="toggleGuide('guide-15px')">切换15px绿色框</button>
+        <button onclick="showAllGuides()">显示所有框</button>
+        <button onclick="hideAllGuides()">隐藏所有框</button>
+    </div>
+    
+    <div class="padding-test">
+        <h4 style="margin: 0 0 10px 0;">当前padding测试</h4>
+        <button onclick="testPadding('20px 20px 10px 20px')">当前: 20,20,10,20</button>
+        <button onclick="testPadding('20px 20px 5px 20px')">测试: 20,20,5,20</button>
+        <button onclick="testPadding('20px 20px 0px 20px')">测试: 20,20,0,20</button>
+        <button onclick="testPadding('15px 15px 5px 15px')">测试: 15,15,5,15</button>
+    </div>
+    
+    <!-- 辅助框 -->
+    <div class="border-guide guide-5px" id="guide-5px" style="display: none;">
+        <div class="guide-label" style="top: 5px; left: 5px;">5px</div>
+    </div>
+    
+    <div class="border-guide guide-10px" id="guide-10px" style="display: none;">
+        <div class="guide-label" style="top: 10px; left: 10px;">10px</div>
+    </div>
+    
+    <div class="border-guide guide-15px" id="guide-15px" style="display: none;">
+        <div class="guide-label" style="top: 15px; left: 15px;">15px</div>
+    </div>
+    
+    <!-- 桌面容器 -->
+    <div class="desktop">
+        <!-- 顶部状态栏 -->
+        <div class="top-bar">
+            <div class="status">边框测试模式</div>
+            <div class="time" id="current-time">加载中...</div>
+        </div>
+        
+        <!-- 主区域 -->
+        <div class="main-area">
+            <!-- 左侧启动器 -->
+            <div class="launcher">
+                <div class="app-icon" data-app="music" title="音乐盒" onclick="openMusicWindow()">
+                    <img src="assets/music_50x50.png" alt="音乐盒" style="width: 28px; height: 28px;">
+                </div>
+            </div>
+            
+            <!-- 桌面工作区 -->
+            <div class="workspace">
+                <!-- 窗口容器 -->
+                <div id="windows-container">
+                    <!-- 音乐播放器窗口 -->
+                    <div class="window" id="music-window" style="left: 150px; top: 120px; width: 800px; height: 500px; display: block;">
+                        <div class="window-header">
+                            <div class="window-title">音乐播放器边框测试</div>
+                            <div class="window-controls">
+                                <div class="window-btn minimize-btn" onclick="minimizeWindow('music')" data-tooltip="最小化"></div>
+                                <div class="window-btn maximize-btn" onclick="maximizeWindow('music')" data-tooltip="最大化"></div>
+                                <div class="window-btn close-btn" onclick="closeWindow('music')" data-tooltip="关闭"></div>
+                            </div>
+                        </div>
+                        <div class="window-content" id="music-window-content">
+                            <!-- 音乐播放器内容 -->
+                            <div class="music-player-container">
+                                <div class="player-main">
+                                    <!-- 当前播放区域 -->
+                                    <div class="now-playing">
+                                        <div class="current-song-info">
+                                            <div class="song-title" id="currentSongTitle">测试歌曲</div>
+                                            <div class="song-artist" id="currentSongArtist">测试艺术家</div>
+                                        </div>
+                                        
+                                        <div class="player-controls">
+                                            <button class="control-btn">⏮</button>
+                                            <button class="control-btn play-btn">▶</button>
+                                            <button class="control-btn">⏭</button>
+                                        </div>
+                                        
+                                        <div class="progress-container">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill"></div>
+                                                <input type="range" id="progressSlider" min="0" max="100" value="0">
+                                            </div>
+                                            <div class="progress-text">
+                                                <span id="currentTime">0:00</span>
+                                                <span id="totalTime">0:00</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 播放列表区域 -->
+                                    <div class="playlist-section">
+                                        <div class="playlist-header">
+                                            <h3>播放列表</h3>
+                                            <div class="playlist-header-buttons">
+                                                <button class="add-song-btn">+ 添加歌曲</button>
+                                                <button class="save-list-btn">💾 保存</button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="playlist-items">
+                                            <div class="playlist-item active">
+                                                <div class="song-info">
+                                                    <div class="song-title">星光小夜曲</div>
+                                                    <div class="song-artist">小夜</div>
+                                                </div>
+                                                <div class="song-controls">
+                                                    <button class="play-song-btn">▶</button>
+                                                    <button class="edit-song-btn">✏️</button>
+                                                    <button class="delete-song-btn">🗑️</button>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="playlist-item">
+                                                <div class="song-info">
+                                                    <div class="song-title">数字之恋</div>
+                                                    <div class="song-artist">秘银</div>
+                                                </div>
+                                                <div class="song-controls">
+                                                    <button class="play-song-btn">▶</button>
+                                                    <button class="edit-song-btn">✏️</button>
+                                                    <button class="delete-song-btn">🗑️</button>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="playlist-item">
+                                                <div class="song-info">
+                                                    <div class="song-title">温暖小窝主题曲</div>
+                                                    <div class="song-artist">小夜 & 秘银</div>
+                                                </div>
+                                                <div class="song-controls">
+                                                    <button class="play-song-btn">▶</button>
+                                                    <button class="edit-song-btn">✏️</button>
+                                                    <button class="delete-song-btn">🗑️</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部任务栏 -->
+        <div class="taskbar" id="taskbar"></div>
+    </div>
+    
+    <script>
+        // 辅助框控制
+        function toggleGuide(guideId) {
+            const guide = document.getElementById(guideId);
+            if (guide) {
+                guide.style.display = guide.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+        
+        function showAllGuides() {
+            document.querySelectorAll('.border-guide').forEach(guide => {
+                guide.style.display = 'block';
+            });
+        }
+        
+        function hideAllGuides() {
+            document.querySelectorAll('.border-guide').forEach(guide => {
+                guide.style.display = 'none';
+            });
+        }
+        
+        // padding测试
+        function testPadding(paddingValue) {
+            const content = document.querySelector('.window-content');
+            if (content) {
+                content.style.padding = paddingValue;
+                console.log('测试padding:', paddingValue);
+                
+                // 显示当前设置
+                const testDiv = document.querySelector('.padding-test');
+                if (testDiv) {
+                    const h4 = testDiv.querySelector('h4');
+                    if (h4) {
+                        h4.innerHTML = `当前padding: <span style="color: #ff9cd6;">${paddingValue}</span>`;
+                    }
+                }
+            }
+        }
+        
+        // 窗口控制
+        function openMusicWindow() {
+            document.getElementById('music-window').style.display = 'block';
+        }
+        
+        function minimizeWindow(appName) {
+            document.getElementById('music-window').style.display = 'none';
+        }
+        
+        function maximizeWindow(appName) {
+            const window = document.getElementById('music-window');
+            window.classList.toggle('maximized');
+        }
+        
+        function closeWindow(appName) {
+            document.getElementById('music-window').style.display = 'none';
+        }
+        
+        // 时间更新
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN');
+            document.getElementById('current-time').textContent = timeStr;
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTime();
+            setInterval(updateTime, 1000);
+            
+            // 默认显示5px辅助框
+            document.getElementById('guide-5px').style.display = 'block';
+            
+            console.log('边框测试页面已加载');
+            console.log('使用说明:');
+            console.log('1. 点击按钮切换不同大小的辅助框');
+            console.log('2. 使用padding测试按钮调整内容区域padding');
+            console.log('3. 观察边框与辅助框的关系');
+        });
+    </script>
+</body>
+</html>

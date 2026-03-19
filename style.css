@@ -1,0 +1,1576 @@
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, rgba(26, 0, 48, 0.2) 0%, rgba(44, 0, 85, 0.2) 100%), 
+                        url('壁纸.png') center/cover no-repeat fixed;
+            color: #f0e6ff;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* 壁纸遮罩层，确保文字可读性 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 5, 20, 0.1); /* 进一步降低透明度 */
+            z-index: -1;
+        }
+        
+        /* 桌面容器 */
+        .desktop {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 顶部状态栏 */
+        .top-bar {
+            height: 40px;
+            background: rgba(20, 10, 40, 0.9);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid rgba(255, 156, 214, 0.2);
+        }
+        
+        .status {
+            flex: 1;
+            font-size: 14px;
+        }
+        
+        .time {
+            font-size: 14px;
+            color: #ff9cd6;
+        }
+        
+        /* 主区域 */
+        .main-area {
+            flex: 1;
+            display: flex;
+            position: relative;
+        }
+        
+        /* 左侧启动器 */
+        .launcher {
+            width: 60px;
+            background: rgba(20, 10, 40, 0.8);
+            border-right: 1px solid rgba(255, 156, 214, 0.2);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .app-icon {
+            width: 40px;
+            height: 40px;
+            margin: 10px 0;
+            background: rgba(255, 156, 214, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden; /* 确保图片不超出容器 */
+        }
+        
+        .app-icon img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+        
+        .app-icon:hover {
+            background: rgba(255, 156, 214, 0.2);
+        }
+        
+        /* 桌面工作区 */
+        .workspace {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 桌面图标 */
+        .desktop-icon {
+            position: absolute;
+            width: 80px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .icon-image {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 5px;
+            background: rgba(255, 156, 214, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .icon-image img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+        
+        .icon-label {
+            color: #f0e6ff;
+            font-size: 12px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* 窗口样式 */
+        .window {
+            position: absolute;
+            background: rgba(20, 10, 40, 0.95);
+            border: 2px solid rgba(255, 156, 214, 0.6); /* 增加宽度和透明度 */
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            min-width: 450px;
+            min-height: 350px;
+            max-height: 70vh; /* 与v3版本完全一致 */
+            top: 100px;
+            left: 200px;
+            display: none;
+            z-index: 100;
+            overflow: hidden; /* 防止内容溢出 */
+            resize: both;
+            box-sizing: border-box; /* 确保边框包含在尺寸内 */
+        }
+        
+        /* 音乐播放器窗口边框优化 */
+        #music-window {
+            border: 2px solid rgba(255, 156, 214, 0.8) !important; /* 更明显的边框 */
+            overflow: hidden !important; /* 裁剪超出的内容，显示完整边框 */
+        }
+        
+        .window.active {
+            display: block;
+        }
+        
+        .window-header {
+            height: 40px;
+            background: rgba(40, 20, 70, 0.9);
+            border-bottom: 1px solid rgba(255, 156, 214, 0.2);
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            cursor: move;
+            user-select: none;
+        }
+        
+        .window-title {
+            flex: 1;
+            color: #ff9cd6;
+            font-weight: bold;
+        }
+        
+        .window-controls {
+            display: flex;
+            gap: 10px;
+            margin-left: 15px;
+        }
+        
+        .window-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .window-btn:hover {
+            opacity: 1;
+            transform: translateY(-1px);
+        }
+        
+        .window-btn:active {
+            transform: translateY(0);
+        }
+        
+        .close-btn { 
+            background: linear-gradient(135deg, #ff5f56 0%, #ff3b30 100%);
+            box-shadow: 0 2px 5px rgba(255, 95, 86, 0.3);
+        }
+        
+        .minimize-btn { 
+            background: linear-gradient(135deg, #ffbd2e 0%, #ffa500 100%);
+            box-shadow: 0 2px 5px rgba(255, 189, 46, 0.3);
+        }
+        
+        .maximize-btn { 
+            background: linear-gradient(135deg, #27ca3f 0%, #1db954 100%);
+            box-shadow: 0 2px 5px rgba(39, 202, 63, 0.3);
+        }
+        
+        /* 按钮图标（使用CSS绘制） */
+        .close-btn::before {
+            content: '×';
+            font-size: 20px;
+            line-height: 1;
+        }
+        
+        .minimize-btn::before {
+            content: '−';
+            font-size: 20px;
+            line-height: 1;
+        }
+        
+        .maximize-btn::before {
+            content: '□';
+            font-size: 16px;
+            line-height: 1;
+        }
+        
+        /* 悬停提示 */
+        .window-btn::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 1000;
+        }
+        
+        .window-btn:hover::after {
+            opacity: 1;
+        }
+        
+        .window-content {
+            padding: 20px; /* 恢复v3版本的原始值 */
+            height: calc(100% - 40px); /* 窗口总高度 - 标题栏高度 */
+            overflow: auto;
+            box-sizing: border-box; /* 确保padding包含在高度内 */
+        }
+        
+        /* 欢迎窗口特定样式 */
+        .welcome-title {
+            color: #ff9cd6;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .welcome-text {
+            color: #d0c0ff;
+            line-height: 1.6;
+            text-align: center;
+        }
+        
+        .status-text {
+            color: #ff9cd6;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        
+        /* 底部任务栏 */
+        .taskbar {
+            height: 50px;
+            background: rgba(20, 10, 40, 0.9);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-top: 1px solid rgba(255, 156, 214, 0.2);
+        }
+        
+        .task-item {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            background: rgba(255, 156, 214, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden; /* 确保图片不超出容器 */
+        }
+        
+        .task-item img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+        
+        .task-item.active {
+            background: rgba(255, 156, 214, 0.3);
+        }
+        
+        /* 音乐播放器窗口特定样式 */
+        .music-player-container {
+            padding: 20px; /* 减小内边距，避免内容超出窗口边框 */
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* 改为hidden，防止滚动条覆盖边框 */
+            min-height: 0; /* 防止flex子元素溢出 */
+        }
+        
+        .player-header {
+            text-align: center;
+            margin-bottom: 40px; /* 调整与下方内容的间距 */
+            padding: 0 20px; /* 调整内边距 */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* 确保内容居中 */
+            justify-content: center;
+        }
+        
+        .player-title-container {
+            display: flex;
+            flex-direction: row; /* 横排布局 */
+            align-items: center; /* 垂直居中 */
+            justify-content: center; /* 水平居中 */
+            gap: 15px; /* 主标题与副标题之间的间距 */
+            flex-wrap: wrap; /* 允许换行 */
+            margin-bottom: 10px; /* 与下方内容的间距 */
+        }
+        
+        .player-title {
+            color: #ff9cd6;
+            font-size: 2.2em; /* 调整主标题大小 */
+            margin: 0; /* 重置margin */
+            line-height: 1.2;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            white-space: nowrap; /* 防止标题换行 */
+        }
+        
+        .player-subtitle {
+            color: #e0c0ff;
+            font-size: 1.3em; /* 调整副标题大小 */
+            line-height: 1.4;
+            letter-spacing: 1px;
+            margin: 0;
+            text-align: center;
+            opacity: 0.95;
+            font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            white-space: nowrap; /* 防止副标题换行 */
+        }
+        
+        /* 分隔符样式 */
+        .title-separator {
+            color: #b8a2ff;
+            font-size: 1.8em;
+            margin: 0 5px;
+            opacity: 0.7;
+        }
+        
+        .player-main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 35px; /* 恢复原始间距 */
+            flex: 1;
+            min-height: 0; /* 防止网格溢出 */
+            align-items: stretch; /* 确保两侧高度一致 */
+            overflow: hidden; /* 防止内容溢出 */
+            height: 100%; /* 确保高度不超出父容器 */
+        }
+        
+        .now-playing {
+            background: rgba(40, 20, 70, 0.8);
+            border-radius: 15px;
+            padding: 15px; /* 减小内边距，避免超出边框 */
+            border: 1px solid rgba(255, 156, 214, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin-top: 10px; /* 添加顶部间距 */
+        }
+        
+        .current-song-info {
+            text-align: center;
+            margin-bottom: 30px; /* 增加与下方按钮的间距 */
+            padding: 0 15px; /* 防止文字贴边 */
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .song-title {
+            font-size: 1.5em;
+            color: #ff9cd6;
+            margin-bottom: 8px; /* 增加歌曲名与艺术家的间距 */
+        }
+        
+        .song-artist {
+            color: #b8a2ff;
+            font-size: 1.1em;
+            margin-top: 5px; /* 确保与歌曲名的间距 */
+        }
+        
+        .song-title {
+            font-size: 1.5em;
+            color: #ff9cd6;
+            margin-bottom: 5px;
+        }
+        
+        .song-artist {
+            color: #b8a2ff;
+            font-size: 1.1em;
+        }
+        
+        .player-controls {
+            display: flex;
+            justify-content: center; /* 确保水平居中 */
+            align-items: center;
+            gap: 25px; /* 调整按钮间距 */
+            margin-top: 25px; /* 增加与上方内容的间距 */
+            margin-bottom: 15px; /* 增加与进度条的间距 */
+            padding: 0; /* 移除内边距，让按钮自然居中 */
+            width: 100%; /* 确保容器宽度 */
+        }
+        
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 156, 214, 0.2);
+            border: 2px solid #ff9cd6;
+            color: #ff9cd6;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0; /* 防止按钮被压缩 */
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 156, 214, 0.4);
+            transform: scale(1.1);
+        }
+        
+        .play-btn {
+            width: 70px;
+            height: 70px;
+            font-size: 1.5em;
+            flex-shrink: 0; /* 确保播放按钮不被压缩 */
+        }
+        
+        /* 进度条区域 */
+        .progress-container {
+            margin-top: 20px;
+            margin-bottom: 10px; /* 增加与时间显示的间距 */
+            width: 100%;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            position: relative;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff9cd6, #b8a2ff);
+            width: 0%;
+            border-radius: 3px;
+            pointer-events: none;
+        }
+        
+        #progressSlider {
+            position: absolute;
+            top: -5px;
+            left: 0;
+            width: 100%;
+            height: 16px;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+            margin: 0;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            color: #b8a2ff;
+            font-size: 0.9em;
+            align-items: center; /* 垂直居中 */
+            margin-top: 8px; /* 增加与进度条的间距 */
+            padding: 0 2px; /* 确保时间显示不贴边 */
+        }
+        
+        /* 播放列表区域 */
+        .playlist-section {
+            background: rgba(40, 20, 70, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 156, 214, 0.3);
+        }
+        
+        .playlist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center; /* 确保垂直居中 */
+            margin-bottom: 25px; /* 进一步增加与列表项的间距 */
+            min-height: 45px; /* 增加最小高度 */
+            padding: 0 10px; /* 增加内边距 */
+            gap: 15px; /* 增加标题与按钮之间的间距 */
+        }
+        
+        .playlist-header h3 {
+            margin: 0;
+            font-size: 1.3em;
+            color: #ff9cd6;
+        }
+        
+        .playlist-header-buttons {
+            display: flex;
+            gap: 15px; /* 增加按钮之间的间距 */
+            align-items: center;
+        }
+        
+        .add-song-btn, .save-list-btn {
+            background: linear-gradient(45deg, #ff9cd6, #b8a2ff);
+            color: white;
+            border: none;
+            padding: 10px 20px; /* 增加内边距，确保按钮大小一致 */
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: transform 0.2s;
+            height: 40px; /* 固定高度 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap; /* 防止文字换行 */
+        }
+        
+        .add-song-btn:hover, .save-list-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .playlist-items {
+            max-height: 300px; /* 恢复原始最大高度 */
+            overflow-y: auto;
+            min-height: 0; /* 允许收缩 */
+        }
+        
+        .playlist-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px; /* 增加内边距，避免内容拥挤 */
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 12px; /* 增加列表项之间的间距 */
+            transition: background 0.2s;
+            min-height: 65px; /* 确保最小高度，防止内容挤压 */
+        }
+        
+        .playlist-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .playlist-item.active {
+            background: rgba(255, 156, 214, 0.2);
+            border-left: 3px solid #ff9cd6;
+        }
+        
+        .song-info {
+            flex: 1;
+            padding-right: 15px; /* 增加与操作按钮的间距 */
+        }
+        
+        .song-name {
+            color: #f0e6ff;
+            font-weight: bold;
+            margin-bottom: 5px; /* 增加与艺术家名的间距 */
+            font-size: 1.1em;
+        }
+        
+        .song-artist-info {
+            color: #b8a2ff;
+            font-size: 0.9em;
+            margin-top: 3px; /* 确保与歌曲名的间距 */
+        }
+        
+        .song-actions {
+            display: flex;
+            gap: 15px; /* 进一步增加按钮间距，避免拥挤 */
+            align-items: center; /* 垂直居中 */
+            justify-content: flex-end; /* 右对齐 */
+            min-width: 120px; /* 确保操作按钮区域有足够宽度 */
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: #b8a2ff;
+            cursor: pointer;
+            font-size: 1.2em; /* 稍微增大图标 */
+            transition: color 0.2s;
+            width: 28px; /* 固定宽度 */
+            height: 28px; /* 固定高度 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0; /* 移除内边距 */
+            flex-shrink: 0; /* 防止按钮被压缩 */
+        }
+        
+        .action-btn:hover {
+            color: #ff9cd6;
+        }
+        
+        /* 模态框样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: linear-gradient(135deg, #1a0030 0%, #2d1b69 100%);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            border: 2px solid rgba(255, 156, 214, 0.5);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            color: #ff9cd6;
+            font-size: 1.5em;
+        }
+        
+        .close-modal-btn {
+            background: none;
+            border: none;
+            color: #b8a2ff;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            color: #b8a2ff;
+            margin-bottom: 8px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 156, 214, 0.3);
+            border-radius: 8px;
+            color: #f0e6ff;
+            font-size: 1em;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #ff9cd6;
+        }
+        
+        .file-upload {
+            border: 2px dashed rgba(255, 156, 214, 0.3);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        
+        .file-upload:hover {
+            border-color: #ff9cd6;
+        }
+        
+        .file-upload-icon {
+            font-size: 2em;
+            color: #b8a2ff;
+            margin-bottom: 10px;
+        }
+        
+        .file-name {
+            color: #b8a2ff;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn-primary, .btn-secondary {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            transition: transform 0.2s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #ff9cd6, #b8a2ff);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #b8a2ff;
+        }
+        
+        .btn-primary:hover, .btn-secondary:hover {
+            transform: scale(1.05);
+        }
+        
+        /* 通知样式 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            z-index: 1001;
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+        }
+        
+        .notification.success {
+            background: linear-gradient(45deg, #28ca42, #2ecc71);
+        }
+        
+        .notification.error {
+            background: linear-gradient(45deg, #ff5f57, #e74c3c);
+        }
+        
+        .notification.info {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* 星光背景 */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+        
+        /* 鼠耳 */
+        .mouse-ears {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            pointer-events: none;
+        }
+        
+        .ear {
+            position: absolute;
+            width: 40px;
+            height: 50px;
+            background: rgba(20, 10, 40, 0.8);
+            border: 2px solid rgba(255, 156, 214, 0.5);
+            border-radius: 50% 50% 0 0;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: transform 0.3s ease;
+        }
+        
+        .ear-left {
+            left: -60px;
+            transform-origin: bottom center;
+        }
+        
+        .ear-right {
+            left: 20px;
+            transform-origin: bottom center;
+        }
+        
+        .ear:hover {
+            transform: scale(1.1);
+        }
+        
+        /* 悬浮播放器 */
+        .floating-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 480px;  /* 增大4倍：180×4=720，但考虑到屏幕空间，先设为480 */
+            height: 320px; /* 增大4倍：120×4=480，调整为320 */
+            background: rgba(30, 15, 60, 0.95); /* 调亮背景色，减少与标题栏的对比 */
+            border-radius: 20px;
+            border: 3px solid rgba(255, 156, 214, 0.4);
+            z-index: 300;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            cursor: default; /* 改为默认光标，因为不再可拖动 */
+        }
+        
+        .floating-player:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+            border-color: rgba(255, 156, 214, 0.6);
+        }
+        
+        .floating-player.minimized {
+            width: 80px;  /* 减小最小化尺寸 */
+            height: 80px;
+            bottom: 20px;
+            right: 20px;
+            cursor: pointer;
+            border: 2px solid rgba(255, 156, 214, 0.5);
+        }
+        
+        .floating-player.minimized:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 156, 214, 0.8);
+        }
+        
+        /* 悬浮播放器标题栏 - 使用更具体的选择器避免冲突 */
+        .floating-player .player-header {
+            height: 33px;  /* 进一步减小高度，标题框更窄 */
+            background: rgba(255, 156, 214, 0.4); /* 进一步加深紫色背景，覆盖更多区域 */
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            color: #ff9cd6;
+            font-size: 16px;  /* 增大字体 */
+            font-weight: bold;
+            margin-bottom: 0 !important; /* 确保没有底部边距 */
+            /* 移除底部边框，避免遮挡视频 */
+            border-radius: 17px 17px 0 0; /* 顶部圆角与容器匹配 */
+        }
+        
+        .floating-player .player-header span {
+            flex: 1; /* 标题占据剩余空间 */
+        }
+        
+        .floating-player .player-controls {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end; /* 确保按钮右对齐 */
+        }
+        
+        .floating-player .player-btn {
+            width: 26px; /* 稍微减小尺寸 */
+            height: 26px;
+            border-radius: 5px; /* 进一步减小圆角 */
+            cursor: pointer;
+            opacity: 0.95; /* 提高不透明度 */
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.95); /* 提高文字对比度 */
+            font-size: 14px;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 156, 214, 0.4); /* 加强边框 */
+            transform: translateY(-15px); /* 向上移动15px，在标题栏中更居中 */
+        }
+        
+        .floating-player .player-btn:hover {
+            opacity: 1;
+            transform: translateY(-16px); /* 基础-15px + 上浮-1px = -16px */
+        }
+        
+        .floating-player .player-btn:active {
+            transform: translateY(-15px); /* 回到基础位置，不要重置到0 */
+        }
+        
+        .floating-player .player-close { 
+            background: linear-gradient(135deg, rgba(255, 95, 86, 0.85) 0%, rgba(255, 59, 48, 0.85) 100%);
+            box-shadow: 0 1px 2px rgba(255, 95, 86, 0.15);
+        }
+        
+        .floating-player .player-minimize { 
+            background: linear-gradient(135deg, rgba(255, 189, 46, 0.85) 0%, rgba(255, 165, 0, 0.85) 100%);
+            box-shadow: 0 1px 2px rgba(255, 189, 46, 0.15);
+        }
+        
+        /* 按钮图标（使用CSS绘制） */
+        .floating-player .player-close::before {
+            content: '×';
+            font-size: 20px;
+            line-height: 1;
+        }
+        
+        .floating-player .player-minimize::before {
+            content: '−';
+            font-size: 20px;
+            line-height: 1;
+        }
+        
+        /* 悬停提示 */
+        .floating-player .player-btn::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 1000;
+        }
+        
+        .floating-player .player-btn:hover::after {
+            opacity: 1;
+        }
+        
+        .floating-player .player-video {
+            width: 100%;
+            height: 281px; /* 调整高度：320px - 33px - 6px(边框) = 281px */
+            object-fit: cover; /* 使用cover填满容器 */
+            object-position: center top; /* 将视频对齐到顶部 */
+            background: transparent; /* 透明背景 */
+            border-radius: 0 0 18px 18px;
+            display: block; /* 确保正确显示 */
+            margin-top: 0 !important; /* 确保没有上边距 */
+            padding-top: 0 !important; /* 确保没有上内边距 */
+        }
+        
+        .floating-player .player-minimized-icon {
+            display: none;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .floating-player .player-status {
+            padding: 5px 10px;
+            font-size: 12px;
+            color: #b8a2ff;
+            text-align: center;
+            border-top: 1px solid rgba(255, 156, 214, 0.1);
+        }
+        
+        .floating-player.minimized .player-video,
+        .floating-player.minimized .player-header,
+        .floating-player.minimized .player-status {
+            display: none;
+        }
+        
+        .floating-player.minimized .player-minimized-icon {
+            display: block;
+        }
+        
+        /* 新增：悬浮播放器控制按钮靠右 */
+
+        
+        /* 记忆卡片 */
+        .memory-card {
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255, 156, 214, 0.05);
+            border: 1px solid rgba(255, 156, 214, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
+        .memory-card:hover {
+            background: rgba(255, 156, 214, 0.1);
+        }
+        
+        .memory-card h4 {
+            color: #ff9cd6;
+            margin-bottom: 5px;
+        }
+        
+        .memory-card p {
+            color: #d0c0ff;
+            font-size: 14px;
+        }
+        
+        /* 窗口缩放手柄 */
+        .window-resize-handle {
+            position: absolute;
+            background: transparent;
+            z-index: 10;
+        }
+        
+        .resize-n { top: 0; left: 10px; right: 10px; height: 5px; cursor: n-resize; }
+        .resize-s { bottom: 0; left: 10px; right: 10px; height: 5px; cursor: s-resize; }
+        .resize-e { top: 10px; right: 0; bottom: 10px; width: 5px; cursor: e-resize; }
+        .resize-w { top: 10px; left: 0; bottom: 10px; width: 5px; cursor: w-resize; }
+        .resize-ne { top: 0; right: 0; width: 10px; height: 10px; cursor: ne-resize; }
+        .resize-nw { top: 0; left: 0; width: 10px; height: 10px; cursor: nw-resize; }
+        .resize-se { bottom: 0; right: 0; width: 10px; height: 10px; cursor: se-resize; }
+        .resize-sw { bottom: 0; left: 0; width: 10px; height: 10px; cursor: sw-resize; }
+        
+        /* ==================== 创作空间样式 ==================== */
+        
+        /* 创作空间容器 */
+        .creation-space-container {
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .creation-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .creation-header h2 {
+            color: #ff9cd6;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .creation-header p {
+            color: #b8a2ff;
+        }
+        
+        /* 主布局 */
+        .creation-main {
+            display: flex;
+            flex: 1;
+            gap: 30px;
+            min-height: 0;
+        }
+        
+        /* 侧边栏 */
+        .creation-sidebar {
+            width: 250px;
+            background: rgba(40, 20, 70, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 156, 214, 0.3);
+        }
+        
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+        
+        .sidebar-section h3 {
+            color: #ff9cd6;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .category-item {
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: #d0c0ff;
+        }
+        
+        .category-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .category-item.active {
+            background: rgba(255, 156, 214, 0.2);
+            color: #ff9cd6;
+            border-left: 3px solid #ff9cd6;
+        }
+        
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .tag {
+            padding: 5px 10px;
+            background: rgba(255, 156, 214, 0.1);
+            border-radius: 15px;
+            font-size: 0.9em;
+            color: #b8a2ff;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tag:hover {
+            background: rgba(255, 156, 214, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .new-creation-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #ff9cd6, #b8a2ff);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+        
+        .new-creation-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        /* 内容区域 */
+        .creation-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 20px;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            max-width: 400px;
+        }
+        
+        .search-box input {
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 156, 214, 0.3);
+            border-radius: 8px;
+            color: #f0e6ff;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .search-box button {
+            padding: 10px 20px;
+            background: rgba(255, 156, 214, 0.2);
+            border: 1px solid rgba(255, 156, 214, 0.5);
+            border-radius: 8px;
+            color: #ff9cd6;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .view-toggle {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        
+        .view-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 156, 214, 0.3);
+            border-radius: 8px;
+            color: #b8a2ff;
+            cursor: pointer;
+            font-size: 0.95em;
+            min-width: 70px;
+            text-align: center;
+            transition: all 0.2s;
+            flex: 1;
+        }
+        
+        .view-btn:hover {
+            background: rgba(255, 156, 214, 0.1);
+        }
+        
+        .view-btn.active {
+            background: rgba(255, 156, 214, 0.2);
+            color: #ff9cd6;
+            border-color: #ff9cd6;
+        }
+        
+        /* 创作网格 */
+        .creations-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .creation-card {
+            background: rgba(40, 20, 70, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 156, 214, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .creation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 156, 214, 0.6);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .card-category {
+            background: rgba(255, 156, 214, 0.2);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            color: #ff9cd6;
+        }
+        
+        .card-date {
+            color: #b8a2ff;
+            font-size: 0.9em;
+        }
+        
+        .card-title {
+            color: #ff9cd6;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .card-excerpt {
+            color: #d0c0ff;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+        
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            background: rgba(255, 156, 214, 0.1);
+            border: 1px solid rgba(255, 156, 214, 0.3);
+            border-radius: 6px;
+            color: #b8a2ff;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover {
+            background: rgba(255, 156, 214, 0.2);
+            color: #ff9cd6;
+        }
+        
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: #b8a2ff;
+        }
+        
+        /* 编辑器样式 */
+        .editor-toolbar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(40, 20, 70, 0.8);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 156, 214, 0.3);
+        }
+        
+        .editor-btn {
+            padding: 6px 12px;
+            background: rgba(255, 156, 214, 0.1);
+            border: 1px solid rgba(255, 156, 214, 0.3);
+            border-radius: 6px;
+            color: #b8a2ff;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .editor-btn:hover {
+            background: rgba(255, 156, 214, 0.2);
+            color: #ff9cd6;
+        }
+        
+        .editor-container {
+            border: 1px solid rgba(255, 156, 214, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .editor-content {
+            min-height: 200px;
+            padding: 15px;
+            color: #f0e6ff;
+            outline: none;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        .editor-content[contenteditable="true"]:empty:before {
+            content: attr(placeholder);
+            color: #b8a2ff;
+            opacity: 0.6;
+        }
+        
+        .editor-preview {
+            min-height: 200px;
+            padding: 15px;
+            color: #f0e6ff;
+            display: none;
+        }
+        
+        .editor-tabs {
+            display: flex;
+            margin-top: 10px;
+        }
+        
+        .editor-tab {
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 156, 214, 0.3);
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            color: #b8a2ff;
+            cursor: pointer;
+        }
+        
+        .editor-tab.active {
+            background: rgba(255, 156, 214, 0.2);
+            color: #ff9cd6;
+            border-color: #ff9cd6;
+        }
+        
+        /* 查看创作样式 */
+        .creation-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 156, 214, 0.2);
+        }
+        
+        .meta-category {
+            background: rgba(255, 156, 214, 0.2);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            color: #ff9cd6;
+        }
+        
+        .meta-date {
+            color: #b8a2ff;
+            font-size: 0.9em;
+        }
+        
+        .meta-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .creation-content-view {
+            padding: 20px 0;
+            color: #f0e6ff;
+            line-height: 1.6;
+        }
+        
+        .creation-content-view img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .creation-content-view pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        .creation-content-view code {
+            font-family: 'Courier New', monospace;
+            color: #ff9cd6;
+        }
+        
+        .creation-content-view a {
+            color: #b8a2ff;
+            text-decoration: underline;
+        }
+        
+        /* 评论区域 */
+        .comments-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 156, 214, 0.2);
+        }
+        
+        .comments-section h4 {
+            color: #ff9cd6;
+            margin-bottom: 20px;
+        }
+        
+        .comments-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        
+        .comment-item {
+            background: rgba(40, 20, 70, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 156, 214, 0.2);
+        }
+        
+        .comment-author {
+            color: #ff9cd6;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .comment-content {
+            color: #f0e6ff;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+        
+        .comment-time {
+            color: #b8a2ff;
+            font-size: 0.8em;
+            text-align: right;
+        }
+        
+        .add-comment {
+            background: rgba(40, 20, 70, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255, 156, 214, 0.3);
+        }
+        
+        .add-comment h5 {
+            color: #ff9cd6;
+            margin-bottom: 10px;
+        }
+        
+        .comment-input {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 156, 214, 0.3);
+            border-radius: 8px;
+            color: #f0e6ff;
+            font-family: 'Microsoft YaHei', sans-serif;
+            margin-bottom: 15px;
+            resize: vertical;
+        }
+        
+        .comment-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+    
