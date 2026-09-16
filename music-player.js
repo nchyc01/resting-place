@@ -34,12 +34,16 @@ const musicPlayer = {
         console.log('音乐播放器初始化完成，歌曲数量:', this.songs.length);
     },
     
-    // 加载示例歌曲（从v3版本移植）
+    // 加载示例歌曲（从v3版本移植，2026-09-16 换成小夜原创五首）
     loadExampleSongs() {
         this.songs = [
-            { id: 1, name: '英雄主义 (Heroism)', artist: '小夜', fileName: 'heroism.mp3', url: 'heroism.mp3' }
+            { id: 1, name: '炉火', artist: '小夜', fileName: 'music_hearth.mp3', url: 'music/music_hearth.mp3' },
+            { id: 2, name: '启程', artist: '小夜', fileName: 'music_departure.mp3', url: 'music/music_departure.mp3' },
+            { id: 3, name: '拔剑', artist: '小夜', fileName: 'music_battle.mp3', url: 'music/music_battle.mp3' },
+            { id: 4, name: '战鼓与风笛', artist: '小夜', fileName: 'music_medieval2.mp3', url: 'music/music_medieval2.mp3' },
+            { id: 5, name: '星轨', artist: '小夜', fileName: 'music_edm.mp3', url: 'music/music_edm.mp3' }
         ];
-        this.nextId = 2;
+        this.nextId = 6;
         
         // 保存到本地存储
         this.savePlaylistToStorage();
@@ -47,7 +51,7 @@ const musicPlayer = {
     
     // 加载保存的播放列表
     loadPlaylistFromStorage() {
-        const savedPlaylist = utils.getLocalStorage('music-playlist', []);
+        const savedPlaylist = utils.getLocalStorage('music-playlist-v2', []);
         if (savedPlaylist && savedPlaylist.length > 0) {
             this.songs = savedPlaylist;
             // 找到最大的ID
@@ -60,7 +64,7 @@ const musicPlayer = {
     
     // 保存播放列表到本地存储
     savePlaylistToStorage() {
-        utils.setLocalStorage('music-playlist', this.songs);
+        utils.setLocalStorage('music-playlist-v2', this.songs);
     },
     
     // 填充音乐窗口内容（使用v3版本的HTML结构）
