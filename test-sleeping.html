@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试Sleeping动画</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e6e6e6;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #3498db;
+            margin-bottom: 30px;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(44, 62, 80, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #34495e;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        .video-container {
+            margin: 20px 0;
+            border: 2px solid #2c3e50;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #000;
+        }
+        
+        video {
+            width: 100%;
+            max-width: 400px;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        button {
+            padding: 12px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52,152,219,0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            border: 1px solid #34495e;
+            font-size: 1.1rem;
+        }
+        
+        .status-text {
+            color: #f1c40f;
+            font-weight: bold;
+        }
+        
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            border: 1px dashed #7f8c8d;
+            font-size: 0.9rem;
+            color: #95a5a6;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎬 测试Sleeping动画</h1>
+    
+    <div class="test-container">
+        <h2>小夜的动画测试</h2>
+        
+        <div class="video-container">
+            <video id="player-video" loop muted playsinline>
+                <!-- 视频源将通过JavaScript设置 -->
+            </video>
+        </div>
+        
+        <div class="controls">
+            <button onclick="switchAnimation('idle')">闲置动画</button>
+            <button onclick="switchAnimation('working')">工作中</button>
+            <button onclick="switchAnimation('studying')">学习中</button>
+            <button onclick="switchAnimation('sleeping')">休息中</button>
+        </div>
+        
+        <div class="status">
+            当前状态: <span class="status-text" id="player-status">未设置</span>
+        </div>
+        
+        <div class="info">
+            <h3>说明:</h3>
+            <p>• 点击按钮切换小夜的不同状态动画</p>
+            <p>• <strong>sleeping动画</strong>是秘银专门为小夜制作的</p>
+            <p>• 动画会自动循环播放</p>
+            <p>• 切换时有淡入淡出效果</p>
+        </div>
+    </div>
+    
+    <script>
+        // 简化的动画切换逻辑（从core.js提取）
+        const animationFiles = {
+            'idle': 'idle.mp4',
+            'working': 'working.mp4',
+            'studying': 'studying.mp4',
+            'sleeping': 'sleeping.mp4'
+        };
+        
+        const statusTexts = {
+            'idle': '在线 · 陪伴中',
+            'working': '工作中 · 播放音乐',
+            'studying': '学习中 · 记录记忆',
+            'sleeping': '休息中 · 晚安好梦'
+        };
+        
+        function switchAnimation(animationType) {
+            const video = document.getElementById('player-video');
+            const statusElement = document.getElementById('player-status');
+            
+            const fileName = animationFiles[animationType] || 'idle.mp4';
+            const statusText = statusTexts[animationType] || '在线 · 陪伴中';
+            
+            // 如果已经是当前动画，不重复切换
+            if (video.src.includes(fileName)) return;
+            
+            console.log('切换动画:', animationType, '文件:', fileName);
+            
+            // 添加淡出效果
+            video.style.transition = 'opacity 0.3s ease';
+            video.style.opacity = '0';
+            
+            // 淡出后切换视频源
+            setTimeout(() => {
+                // 切换视频源
+                video.src = fileName;
+                
+                // 加载并播放
+                video.load();
+                video.play().catch(e => {
+                    console.log('视频播放被阻止:', e);
+                });
+                
+                // 淡入效果
+                setTimeout(() => {
+                    video.style.opacity = '1';
+                }, 50);
+                
+                // 更新状态文本
+                if (statusElement) {
+                    statusElement.textContent = statusText;
+                }
+            }, 300);
+        }
+        
+        // 页面加载时初始化
+        window.addEventListener('load', () => {
+            const video = document.getElementById('player-video');
+            // 初始设置为idle动画
+            video.src = 'idle.mp4';
+            video.load();
+            video.play().catch(e => console.log('初始播放被阻止:', e));
+            document.getElementById('player-status').textContent = '在线 · 陪伴中';
+            
+            console.log('测试页面加载完成');
+            console.log('可用的动画:', Object.keys(animationFiles).join(', '));
+        });
+    </script>
+</body>
+</html>

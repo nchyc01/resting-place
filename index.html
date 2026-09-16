@@ -194,16 +194,9 @@
                 return windowElement;
             };
             
-            // 默认打开欢迎窗口（延迟确保脚本加载完成）
-            setTimeout(() => {
-                openApp('welcome');
-                // 确保欢迎窗口内容被填充
-                setTimeout(() => {
-                    if (typeof welcomePage !== 'undefined' && typeof welcomePage.fillWelcomeWindow === 'function') {
-                        welcomePage.fillWelcomeWindow();
-                    }
-                }, 100);
-            }, 800);
+            // 不再自动打开欢迎窗口
+            // 网页打开时小夜在睡觉，等待用户手动唤醒和打开应用
+            console.log('网页加载完成，小夜在睡觉中...');
         });
     </script>
 </body>

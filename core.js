@@ -144,6 +144,10 @@ const windowSystem = {
         // 切换悬浮播放器动画
         floatingPlayer.switchAnimationByApp(appName);
         
+        // 触发应用打开事件（用于唤醒sleeping状态的小夜）
+        const appOpenedEvent = new CustomEvent('appOpened', { detail: { appName } });
+        document.dispatchEvent(appOpenedEvent);
+        
         return windowElement;
     },
     
@@ -466,7 +470,8 @@ const floatingPlayer = {
         const statusTexts = {
             'idle': '在线 · 陪伴中',
             'working': '工作中 · 播放音乐',
-            'studying': '学习中 · 记录记忆'
+            'studying': '学习中 · 记录记忆',
+            'sleeping': '休息中 · 晚安好梦'
         };
         
         const fileName = animationFiles[animationType] || animationFiles.idle || '闲置.mp4';
@@ -531,11 +536,12 @@ const floatingPlayer = {
     // 检测动画文件（智能匹配文件名）
     detectAnimationFiles() {
         // 根据实际文件名调整映射
-        // 当前文件：idle.mp4, studying.mp4, working.mp4
+        // 当前文件：idle.mp4, studying.mp4, working.mp4, sleeping.mp4
         const actualFiles = {
             'idle': 'idle.mp4',
             'working': 'working.mp4',
-            'studying': 'studying.mp4'
+            'studying': 'studying.mp4',
+            'sleeping': 'sleeping.mp4'
         };
         
         console.log('使用实际动画文件映射:', actualFiles);
@@ -546,19 +552,44 @@ const floatingPlayer = {
     init() {
         console.log('初始化悬浮播放器...');
         
-        // 初始化视频播放
         const video = document.getElementById('player-video');
+        const statusElement = document.getElementById('player-status');
+        const player = document.getElementById('floating-player');
+        
         if (video) {
+            // 默认设置为sleeping动画（小夜在睡觉）
+            const animationFiles = this.detectAnimationFiles();
+            video.src = animationFiles.sleeping || animationFiles.idle;
+            
+            // 更新状态文本
+            if (statusElement) {
+                statusElement.textContent = '休息中 · 晚安好梦';
+            }
+            
+            // 播放视频
             video.play().catch(e => {
                 console.log('视频自动播放被阻止:', e);
             });
+            
+            console.log('默认加载sleeping动画');
         }
         
-        // 为最小化图标添加点击事件（修复点击无反应问题）
-        const player = document.getElementById('floating-player');
+        // 为悬浮播放器添加点击唤醒功能
         if (player) {
-            // 当悬浮播放器处于最小化状态时，整个元素都可以点击恢复
+            let isSleeping = true; // 标记小夜是否在睡觉
+            
+            // 点击唤醒功能（当小夜在睡觉时）
             player.addEventListener('click', (e) => {
+                if (isSleeping && video) {
+                    // 唤醒小夜：切换到idle状态
+                    isSleeping = false;
+                    this.switchAnimation('idle');
+                    utils.updateStatus('小夜被唤醒啦！');
+                    e.stopPropagation(); // 阻止事件冒泡
+                    return; // 唤醒后不执行最小化逻辑
+                }
+                
+                // 原有的最小化恢复逻辑
                 if (player.classList.contains('minimized')) {
                     // 如果是最小化状态，点击恢复
                     player.classList.remove('minimized');
@@ -567,16 +598,24 @@ const floatingPlayer = {
                 }
             });
             
-            // 确保最小化按钮的点击不会触发上面的恢复逻辑
+            // 确保最小化按钮的点击不会触发上面的唤醒逻辑
             const minimizeBtn = player.querySelector('.player-minimize');
             if (minimizeBtn) {
                 minimizeBtn.addEventListener('click', (e) => {
                     e.stopPropagation(); // 阻止事件冒泡到父元素
                 });
             }
+            
+            // 监听应用打开事件，如果打开应用则自动唤醒
+            document.addEventListener('appOpened', (event) => {
+                if (isSleeping) {
+                    isSleeping = false;
+                    console.log('应用打开，自动唤醒小夜（应用:', event.detail?.appName, ')');
+                }
+            });
         }
         
-        console.log('悬浮播放器初始化完成');
+        console.log('悬浮播放器初始化完成（默认sleeping状态）');
     }
 };
 

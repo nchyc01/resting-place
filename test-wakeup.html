@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试唤醒功能</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e6e6e6;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #3498db;
+            margin-bottom: 30px;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(44, 62, 80, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #34495e;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        .instructions {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            border: 1px solid #34495e;
+            text-align: left;
+        }
+        
+        .step {
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: #3498db;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52,152,219,0.4);
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            border: 1px solid #34495e;
+            font-size: 1.1rem;
+        }
+        
+        .status-text {
+            color: #f1c40f;
+            font-weight: bold;
+        }
+        
+        .log {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            border: 1px dashed #7f8c8d;
+            font-family: monospace;
+            font-size: 0.9rem;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 3px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>🔄 测试小夜唤醒功能</h1>
+    
+    <div class="test-container">
+        <h2>唤醒机制测试</h2>
+        
+        <div class="instructions">
+            <div class="step">
+                <span class="step-number">1</span>
+                网页打开时，小夜默认在睡觉（sleeping动画）
+            </div>
+            <div class="step">
+                <span class="step-number">2</span>
+                点击悬浮播放器唤醒小夜（切换到idle状态）
+            </div>
+            <div class="step">
+                <span class="step-number">3</span>
+                打开应用自动唤醒小夜（如果还在睡觉）
+            </div>
+            <div class="step">
+                <span class="step-number">4</span>
+                之后根据打开的应用切换状态
+            </div>
+        </div>
+        
+        <div>
+            <button onclick="simulateClickPlayer()">模拟点击悬浮播放器</button>
+            <button onclick="simulateOpenApp('music')">模拟打开音乐应用</button>
+            <button onclick="simulateOpenApp('diary')">模拟打开日记应用</button>
+            <button onclick="resetTest()">重置测试</button>
+        </div>
+        
+        <div class="status">
+            当前状态: <span class="status-text" id="current-state">sleeping（睡觉中）</span>
+        </div>
+        
+        <div class="log" id="log-container">
+            <div class="log-entry">测试开始...</div>
+        </div>
+    </div>
+    
+    <script>
+        let isSleeping = true;
+        let currentAnimation = 'sleeping';
+        const logContainer = document.getElementById('log-container');
+        
+        function log(message) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        function updateState(state, animation) {
+            isSleeping = state === 'sleeping';
+            currentAnimation = animation;
+            document.getElementById('current-state').textContent = 
+                `${animation}（${state === 'sleeping' ? '睡觉中' : '已唤醒'}）`;
+        }
+        
+        function simulateClickPlayer() {
+            if (isSleeping) {
+                log('点击悬浮播放器...');
+                log('小夜被唤醒啦！切换到idle状态');
+                updateState('awake', 'idle');
+            } else {
+                log('小夜已经醒了，点击无效');
+            }
+        }
+        
+        function simulateOpenApp(appName) {
+            log(`打开应用: ${appName}`);
+            
+            if (isSleeping) {
+                log('应用打开，自动唤醒小夜');
+                updateState('awake', 'idle');
+            }
+            
+            // 根据应用切换状态
+            const appAnimationMap = {
+                'music': 'working',
+                'diary': 'studying',
+                'memory': 'studying',
+                'creation': 'studying',
+                'welcome': 'idle',
+                'about': 'idle'
+            };
+            
+            const animationType = appAnimationMap[appName] || 'idle';
+            log(`切换到状态: ${animationType}`);
+            updateState('awake', animationType);
+        }
+        
+        function resetTest() {
+            log('重置测试...');
+            updateState('sleeping', 'sleeping');
+            log('小夜回到睡觉状态');
+        }
+        
+        // 初始化
+        window.addEventListener('load', () => {
+            log('测试页面加载完成');
+            log('小夜初始状态: sleeping（睡觉中）');
+            updateState('sleeping', 'sleeping');
+        });
+    </script>
+</body>
+</html>

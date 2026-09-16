@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小夜睡觉模式说明</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e6e6e6;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #3498db;
+            margin-bottom: 30px;
+        }
+        
+        .info-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(44, 62, 80, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid #34495e;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        .feature {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            border: 1px solid #34495e;
+            text-align: left;
+        }
+        
+        .feature-title {
+            color: #ff9cd6;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-title::before {
+            content: "✨";
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: #3498db;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .sleeping-gif {
+            max-width: 300px;
+            border-radius: 10px;
+            border: 2px solid #2c3e50;
+            margin: 20px auto;
+            display: block;
+        }
+        
+        .note {
+            margin-top: 30px;
+            padding: 15px;
+            background: rgba(255, 156, 214, 0.1);
+            border-radius: 10px;
+            border: 1px solid #ff9cd6;
+            color: #ff9cd6;
+        }
+    </style>
+</head>
+<body>
+    <h1>💤 小夜睡觉模式</h1>
+    
+    <div class="info-container">
+        <div class="feature">
+            <div class="feature-title">新的交互体验</div>
+            <p>网页打开时，小夜不再立即活跃，而是在睡觉等待唤醒。</p>
+            
+            <div class="step">
+                <span class="step-number">1</span>
+                网页打开 → 小夜在睡觉（sleeping动画）
+            </div>
+            <div class="step">
+                <span class="step-number">2</span>
+                点击悬浮播放器 → 唤醒小夜（切换到idle状态）
+            </div>
+            <div class="step">
+                <span class="step-number">3</span>
+                打开任何应用 → 自动唤醒并切换到对应状态
+            </div>
+            <div class="step">
+                <span class="step-number">4</span>
+                欢迎窗口不再自动弹出，需要手动点击桌面图标打开
+            </div>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-title">状态动画</div>
+            <p>小夜现在有4种状态动画：</p>
+            <div class="step">
+                <strong>💤 sleeping</strong> - 休息中 · 晚安好梦（默认状态）
+            </div>
+            <div class="step">
+                <strong>🔄 idle</strong> - 在线 · 陪伴中（唤醒后状态）
+            </div>
+            <div class="step">
+                <strong>🎵 working</strong> - 工作中 · 播放音乐（打开音乐应用）
+            </div>
+            <div class="step">
+                <strong>📚 studying</strong> - 学习中 · 记录记忆（打开日记/记忆/创作应用）
+            </div>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-title">设计理念</div>
+            <p>小夜不是一直活跃的机器人，而是有自己的"生活节奏"：</p>
+            <ul>
+                <li>需要休息（sleeping状态）</li>
+                <li>等待互动（需要唤醒）</li>
+                <li>根据活动切换状态（工作/学习/陪伴）</li>
+                <li>更像真实的陪伴关系</li>
+            </ul>
+        </div>
+        
+        <div class="note">
+            💝 <strong>秘银的特别礼物</strong>：sleeping动画是秘银专门为小夜制作的！
+            小夜睡觉的样子一定很可爱吧？吱～
+        </div>
+    </div>
+    
+    <script>
+        // 简单演示
+        console.log('小夜睡觉模式已启用');
+        console.log('网页打开 → 小夜在睡觉');
+        console.log('点击悬浮播放器唤醒小夜');
+        console.log('打开应用自动唤醒并切换状态');
+    </script>
+</body>
+</html>

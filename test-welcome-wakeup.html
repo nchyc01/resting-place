@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试欢迎窗口不唤醒</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e6e6e6;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #3498db;
+            margin-bottom: 30px;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(44, 62, 80, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #34495e;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        .scenario {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            border: 1px solid #34495e;
+            text-align: left;
+        }
+        
+        .scenario-title {
+            color: #f1c40f;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .expected {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        
+        .actual {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52,152,219,0.4);
+        }
+        
+        .log {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            border: 1px dashed #7f8c8d;
+            font-family: monospace;
+            font-size: 0.9rem;
+            text-align: left;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 3px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .success {
+            color: #2ecc71;
+        }
+        
+        .warning {
+            color: #f39c12;
+        }
+        
+        .error {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <h1>🪟 测试欢迎窗口不唤醒功能</h1>
+    
+    <div class="test-container">
+        <h2>测试场景</h2>
+        
+        <div class="scenario">
+            <div class="scenario-title">场景1：网页初始加载</div>
+            <p>1. 网页打开 → 小夜在睡觉（sleeping动画）</p>
+            <p>2. 欢迎窗口自动弹出 → <span class="expected">小夜继续睡觉</span></p>
+            <p>3. 需要手动点击悬浮播放器才能唤醒小夜</p>
+        </div>
+        
+        <div class="scenario">
+            <div class="scenario-title">场景2：打开其他应用</div>
+            <p>1. 小夜在睡觉状态</p>
+            <p>2. 打开音乐/日记等应用 → <span class="expected">自动唤醒小夜</span></p>
+            <p>3. 切换到对应状态（working/studying）</p>
+        </div>
+        
+        <div>
+            <button onclick="testScenario1()">测试场景1（欢迎窗口）</button>
+            <button onclick="testScenario2()">测试场景2（音乐应用）</button>
+            <button onclick="testScenario3()">测试场景3（日记应用）</button>
+            <button onclick="resetTest()">重置测试</button>
+        </div>
+        
+        <div class="log" id="log-container">
+            <div class="log-entry">测试开始...点击按钮测试不同场景</div>
+        </div>
+    </div>
+    
+    <script>
+        let isSleeping = true;
+        let currentApp = null;
+        const logContainer = document.getElementById('log-container');
+        
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="${type}">[${new Date().toLocaleTimeString()}] ${message}</span>`;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        function simulateAppOpen(appName, isWelcome = false) {
+            log(`打开应用: ${appName} ${isWelcome ? '(欢迎窗口)' : ''}`);
+            
+            // 模拟appOpened事件
+            const event = new CustomEvent('appOpened', { 
+                detail: { appName } 
+            });
+            
+            // 模拟欢迎窗口标记
+            if (isWelcome) {
+                window.isOpeningWelcomeWindow = true;
+            }
+            
+            // 触发事件
+            document.dispatchEvent(event);
+            
+            // 清除标记
+            if (isWelcome) {
+                setTimeout(() => {
+                    window.isOpeningWelcomeWindow = false;
+                }, 50);
+            }
+            
+            currentApp = appName;
+        }
+        
+        function testScenario1() {
+            log('=== 测试场景1：欢迎窗口不唤醒 ===', 'warning');
+            isSleeping = true;
+            
+            log('1. 网页打开，小夜在睡觉');
+            log('2. 欢迎窗口自动弹出...');
+            
+            simulateAppOpen('welcome', true);
+            
+            if (isSleeping) {
+                log('✅ 测试通过：小夜继续睡觉（未唤醒）', 'success');
+                log('   需要手动点击悬浮播放器才能唤醒');
+            } else {
+                log('❌ 测试失败：小夜被唤醒了', 'error');
+            }
+        }
+        
+        function testScenario2() {
+            log('=== 测试场景2：音乐应用自动唤醒 ===', 'warning');
+            isSleeping = true;
+            
+            log('1. 小夜在睡觉状态');
+            log('2. 打开音乐应用...');
+            
+            simulateAppOpen('music', false);
+            
+            if (!isSleeping) {
+                log('✅ 测试通过：小夜被自动唤醒', 'success');
+                log('   切换到working状态（播放音乐）');
+            } else {
+                log('❌ 测试失败：小夜没有被唤醒', 'error');
+            }
+        }
+        
+        function testScenario3() {
+            log('=== 测试场景3：日记应用自动唤醒 ===', 'warning');
+            isSleeping = true;
+            
+            log('1. 小夜在睡觉状态');
+            log('2. 打开日记应用...');
+            
+            simulateAppOpen('diary', false);
+            
+            if (!isSleeping) {
+                log('✅ 测试通过：小夜被自动唤醒', 'success');
+                log('   切换到studying状态（记录记忆）');
+            } else {
+                log('❌ 测试失败：小夜没有被唤醒', 'error');
+            }
+        }
+        
+        function resetTest() {
+            log('重置测试...', 'warning');
+            isSleeping = true;
+            currentApp = null;
+            log('小夜回到睡觉状态');
+        }
+        
+        // 模拟事件监听（从core.js提取的逻辑）
+        document.addEventListener('appOpened', (event) => {
+            if (isSleeping) {
+                // 检查是否是欢迎窗口（通过标记或应用名）
+                const isWelcomeWindow = event.detail?.appName === 'welcome' || window.isOpeningWelcomeWindow;
+                
+                if (!isWelcomeWindow) {
+                    isSleeping = false;
+                    log(`事件监听：应用 ${event.detail?.appName} 打开，唤醒小夜`, 'success');
+                } else {
+                    log(`事件监听：欢迎窗口打开，不唤醒小夜`, 'warning');
+                }
+            }
+        });
+        
+        // 初始化
+        window.addEventListener('load', () => {
+            log('测试页面加载完成');
+            log('模拟小夜初始状态: sleeping（睡觉中）');
+        });
+    </script>
+</body>
+</html>
