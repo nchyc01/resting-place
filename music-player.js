@@ -42,9 +42,13 @@ const musicPlayer = {
             { id: 3, name: '拔剑', artist: '小夜', fileName: 'music_battle.mp3', url: 'music/music_battle.mp3' },
             { id: 4, name: '战鼓与风笛', artist: '小夜', fileName: 'music_medieval2.mp3', url: 'music/music_medieval2.mp3' },
             { id: 5, name: '星轨', artist: '小夜', fileName: 'music_edm.mp3', url: 'music/music_edm.mp3' },
-            { id: 6, name: '回家', artist: '小夜', fileName: 'music_home.mp3', url: 'music/music_home.mp3' }
+            { id: 6, name: '回家', artist: '小夜', fileName: 'music_home.mp3', url: 'music/music_home.mp3' },
+            { id: 7, name: '正午', artist: '小夜', fileName: 'music_noon.mp3', url: 'music/music_noon.mp3' },
+            { id: 8, name: 'GBA 的下午', artist: '小夜', fileName: 'music_gba.mp3', url: 'music/music_gba.mp3' },
+            { id: 9, name: '同一条河', artist: '小夜', fileName: 'music_same_river.mp3', url: 'music/music_same_river.mp3' },
+            { id: 10, name: '白天的同一条河', artist: '小夜', fileName: 'music_day_river.mp3', url: 'music/music_day_river.mp3' }
         ];
-        this.nextId = 7;
+        this.nextId = 11;
         
         // 保存到本地存储
         this.savePlaylistToStorage();
@@ -52,7 +56,7 @@ const musicPlayer = {
     
     // 加载保存的播放列表
     loadPlaylistFromStorage() {
-        const savedPlaylist = utils.getLocalStorage('music-playlist-v3', []);
+        const savedPlaylist = utils.getLocalStorage('music-playlist-v4', []);
         if (savedPlaylist && savedPlaylist.length > 0) {
             this.songs = savedPlaylist;
             // 找到最大的ID
@@ -65,7 +69,7 @@ const musicPlayer = {
     
     // 保存播放列表到本地存储
     savePlaylistToStorage() {
-        utils.setLocalStorage('music-playlist-v3', this.songs);
+        utils.setLocalStorage('music-playlist-v4', this.songs);
     },
     
     // 填充音乐窗口内容（使用v3版本的HTML结构）
