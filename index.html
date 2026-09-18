@@ -46,9 +46,9 @@
                 <div class="app-icon" data-app="creation" title="创作空间">
                     <img src="assets/creation_50x50.png" alt="创作空间" style="width: 28px; height: 28px;">
                 </div>
-                <a class="app-icon" href="travel/ye-travel.html" target="_blank" title="出门旅行（小夜的旅行游戏）" style="text-decoration:none;">
+                <div class="app-icon" data-app="travel" title="出门旅行（小夜的旅行游戏）">
                     <img src="travel/travel_images/blue_lake.webp" alt="出门旅行" style="width: 28px; height: 28px; border-radius: 6px; object-fit: cover;">
-                </a>
+                </div>
             </div>
             
             <!-- 桌面工作区 -->
@@ -96,12 +96,12 @@
                     <div class="icon-label">创作空间</div>
                 </div>
 
-                <a class="desktop-icon" style="top: 150px; left: 150px; text-decoration: none; color: inherit;" href="travel/ye-travel.html" target="_blank">
+                <div class="desktop-icon" style="top: 150px; left: 150px;" data-app="travel">
                     <div class="icon-image">
                         <img src="travel/travel_images/blue_lake.webp" alt="出门旅行" style="width: 50px; height: 50px; border-radius: 10px; object-fit: cover;">
                     </div>
                     <div class="icon-label">出门旅行</div>
-                </a>
+                </div>
                 
                 <!-- 窗口容器 -->
                 <div id="windows-container">
@@ -198,6 +198,15 @@
                         case 'creation':
                             creationSpace.fillCreationWindow();
                             break;
+                        case 'travel': {
+                            const travelBox = document.getElementById('travel-window-content');
+                            if (travelBox) {
+                                travelBox.style.padding = '0';
+                                travelBox.style.height = '100%';
+                                travelBox.innerHTML = '<iframe src="travel/ye-travel.html" title="出门旅行" style="width:100%;height:100%;border:0;display:block;border-radius:8px;background:#0d0b14;"></iframe>';
+                            }
+                            break;
+                        }
                     }
                 }, 50);
                 

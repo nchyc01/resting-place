@@ -101,7 +101,8 @@ const windowSystem = {
         'diary': '日记本',
         'memory': '记忆库',
         'about': '关于小夜',
-        'creation': '创作空间'
+        'creation': '创作空间',
+        'travel': '出门旅行'
     },
     
     // 窗口位置配置（从v3版本获取）
@@ -111,7 +112,8 @@ const windowSystem = {
         'diary': { left: '200px', top: '100px', width: '800px', height: '600px' },
         'memory': { left: '200px', top: '140px', width: '700px', height: '450px' },
         'about': { left: '250px', top: '160px', width: '650px', height: '420px' },
-        'creation': { left: '300px', top: '180px', width: '900px', height: '700px' } // 创作空间需要更大窗口
+        'creation': { left: '300px', top: '180px', width: '900px', height: '700px' }, // 创作空间需要更大窗口
+        'travel': { left: '120px', top: '80px', width: '1120px', height: '740px' } // 旅行游戏
     },
     
     // 打开应用窗口
