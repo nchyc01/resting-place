@@ -221,6 +221,24 @@
                 e.preventDefault();
                 showMenu(e.clientX, e.clientY, [
                     {
+                        label: '换皮肤（当前：' + (window.hutSkins ? window.hutSkins.getSkin() : '-') + '）',
+                        fn: () => {
+                            if (!window.hutSkins) return;
+                            const ids = window.hutSkins.skins.map(s => s.id);
+                            const i = ids.indexOf(window.hutSkins.getSkin());
+                            window.hutSkins.setSkin(ids[(i + 1) % ids.length]);
+                        }
+                    },
+                    {
+                        label: '换壁纸（当前：' + (window.hutSkins ? (window.hutSkins.getWall() || '无') : '-') + '）',
+                        fn: () => {
+                            if (!window.hutSkins) return;
+                            const ids = window.hutSkins.walls.map(w => w.id);
+                            const i = ids.indexOf(window.hutSkins.getWall());
+                            window.hutSkins.setWall(ids[(i + 1) % ids.length]);
+                        }
+                    },
+                    {
                         label: '网格对齐：' + (gridOn() ? '已开（点一下关掉）' : '已关（点一下打开）'),
                         fn: () => { save(GRID_KEY, !gridOn()); }
                     },

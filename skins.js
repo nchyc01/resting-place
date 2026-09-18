@@ -76,7 +76,7 @@
         const imgEl = document.getElementById('today-img');
         if (dateEl) dateEl.textContent = (d.getMonth() + 1) + ' 月 ' + d.getDate() + ' 日 · 周' + week;
         if (lineEl) lineEl.textContent = LINES[Math.floor(Math.random() * LINES.length)];
-        if (imgEl) imgEl.src = '../travel/travel_images/' + IMGS[Math.floor(Math.random() * IMGS.length)] + '.webp';
+        if (imgEl) imgEl.src = 'travel/travel_images/' + IMGS[Math.floor(Math.random() * IMGS.length)] + '.webp';
     }
 
     window.hutSkins = {

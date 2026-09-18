@@ -7,25 +7,17 @@
     
     <!-- CSS文件 -->
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="skin-layer.css?v=2">
     
     <!-- 预加载图标 -->
-    <link rel="preload" href="assets/home_50x50.png" as="image">
-    <link rel="preload" href="assets/music_50x50.png" as="image">
-    <link rel="preload" href="assets/memory_50x50.png" as="image">
-    <link rel="preload" href="assets/profile_50x50.png" as="image">
-    <link rel="preload" href="assets/diary_50x50.png" as="image">
+    <link rel="preload" href="../assets/home_50x50.png" as="image">
+    <link rel="preload" href="../assets/music_50x50.png" as="image">
+    <link rel="preload" href="../assets/memory_50x50.png" as="image">
+    <link rel="preload" href="../assets/profile_50x50.png" as="image">
+    <link rel="preload" href="../assets/diary_50x50.png" as="image">
 </head>
 <body>
     <!-- 桌面容器 -->
     <div class="desktop">
-        <!-- 今天的小卡片（小夜版） -->
-        <div id="today-card">
-            <div class="today-date" id="today-date">今天</div>
-            <div class="today-line" id="today-line"></div>
-            <img id="today-img" src="travel/travel_images/blue_lake.webp" alt="今天">
-            <div class="today-hint">点一下换一张</div>
-        </div>
         <!-- 顶部状态栏 -->
         <div class="top-bar">
             <div class="status">小夜的温暖小窝 v3模块化版</div>
@@ -42,49 +34,49 @@
                 <!-- 桌面图标 -->
                 <div class="desktop-icon" style="top: 50px; left: 50px;" data-app="welcome">
                     <div class="icon-image">
-                        <img src="assets/home_64x64.png" alt="温暖小窝" style="width: 50px; height: 50px;">
+                        <img src="../assets/home_64x64.png" alt="温暖小窝" style="width: 50px; height: 50px;">
                     </div>
                     <div class="icon-label">温暖小窝</div>
                 </div>
                 
                 <div class="desktop-icon" style="top: 50px; left: 150px;" data-app="music">
                     <div class="icon-image">
-                        <img src="assets/music_64x64.png" alt="音乐盒" style="width: 50px; height: 50px;">
+                        <img src="../assets/music_64x64.png" alt="音乐盒" style="width: 50px; height: 50px;">
                     </div>
                     <div class="icon-label">音乐盒</div>
                 </div>
                 
                 <div class="desktop-icon" style="top: 50px; left: 250px;" data-app="diary">
                     <div class="icon-image">
-                        <img src="assets/diary_64x64.png" alt="日记本" style="width: 50px; height: 50px;">
+                        <img src="../assets/diary_64x64.png" alt="日记本" style="width: 50px; height: 50px;">
                     </div>
                     <div class="icon-label">日记本</div>
                 </div>
                 
                 <div class="desktop-icon" style="top: 50px; left: 350px;" data-app="memory">
                     <div class="icon-image">
-                        <img src="assets/memory_64x64.png" alt="记忆库" style="width: 50px; height: 50px;">
+                        <img src="../assets/memory_64x64.png" alt="记忆库" style="width: 50px; height: 50px;">
                     </div>
                     <div class="icon-label">记忆库</div>
                 </div>
                 
                 <div class="desktop-icon" style="top: 50px; left: 450px;" data-app="about">
                     <div class="icon-image">
-                        <img src="assets/profile_64x64.png" alt="关于小夜" style="width: 50px; height: 50px;">
+                        <img src="../assets/profile_64x64.png" alt="关于小夜" style="width: 50px; height: 50px;">
                     </div>
                     <div class="icon-label">关于小夜</div>
                 </div>
                 
                 <div class="desktop-icon" style="top: 150px; left: 50px;" data-app="creation">
                     <div class="icon-image">
-                        <img src="assets/creation_64x64.png" alt="创作空间" style="width: 50px; height: 50px;">
+                        <img src="../assets/creation_64x64.png" alt="创作空间" style="width: 50px; height: 50px;">
                     </div>
                     <div class="icon-label">创作空间</div>
                 </div>
 
                 <div class="desktop-icon" style="top: 150px; left: 150px;" data-app="travel">
                     <div class="icon-image">
-                        <img src="travel/travel_images/blue_lake.webp" alt="出门旅行" style="width: 50px; height: 50px; border-radius: 10px; object-fit: cover;">
+                        <img src="../travel/travel_images/blue_lake.webp" alt="出门旅行" style="width: 50px; height: 50px; border-radius: 10px; object-fit: cover;">
                     </div>
                     <div class="icon-label">出门旅行</div>
                 </div>
@@ -108,7 +100,7 @@
                         您的浏览器不支持视频播放
                     </video>
                     <div class="player-minimized-icon">
-                        <img src="assets/profile_64x64.png" alt="小夜" style="width: 60px; height: 60px;">
+                        <img src="../assets/profile_64x64.png" alt="小夜" style="width: 60px; height: 60px;">
                     </div>
                     <div class="player-status" id="player-status">在线 · 陪伴中</div>
                 </div>
@@ -133,7 +125,6 @@
     <script src="welcome-page.js"></script>
     <script src="creation-space.js"></script>
 <script src="desktop.js?v=4"></script>
-<script src="skins.js?v=1"></script>
     
     <!-- 初始化脚本 -->
     <script>
@@ -191,7 +182,7 @@
                             if (travelBox) {
                                 travelBox.style.padding = '0';
                                 travelBox.style.height = '100%';
-                                travelBox.innerHTML = '<iframe src="travel/ye-travel.html" title="出门旅行" style="width:100%;height:100%;border:0;display:block;border-radius:8px;background:#0d0b14;"></iframe>';
+                                travelBox.innerHTML = '<iframe src="../travel/ye-travel.html" title="出门旅行" style="width:100%;height:100%;border:0;display:block;border-radius:8px;background:#0d0b14;"></iframe>';
                             }
                             break;
                         }

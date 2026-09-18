@@ -46,11 +46,11 @@ button, .add-song-btn, .save-list-btn, .btn-primary, .btn-secondary, .action-btn
 }
 
 /* ---------- 壁纸（右键桌面可换） ---------- */
-body[data-wall='codelab'] { background: url('../壁纸.png') center/cover no-repeat fixed !important; }
-body[data-wall='lake']    { background: url('../travel/travel_images/blue_lake.webp') center/cover no-repeat fixed !important; }
-body[data-wall='garden']  { background: url('../travel/travel_images/queens_gardens.webp') center/cover no-repeat fixed !important; }
-body[data-wall='shrine']  { background: url('../travel/travel_images/firelink_shrine.webp') center/cover no-repeat fixed !important; }
-body[data-wall='peak']    { background: url('../travel/travel_images/crystal_peak.webp') center/cover no-repeat fixed !important; }
+body[data-wall='codelab'] { background: url('壁纸.png') center/cover no-repeat fixed !important; }
+body[data-wall='lake']    { background: url('travel/travel_images/blue_lake.webp') center/cover no-repeat fixed !important; }
+body[data-wall='garden']  { background: url('travel/travel_images/queens_gardens.webp') center/cover no-repeat fixed !important; }
+body[data-wall='shrine']  { background: url('travel/travel_images/firelink_shrine.webp') center/cover no-repeat fixed !important; }
+body[data-wall='peak']    { background: url('travel/travel_images/crystal_peak.webp') center/cover no-repeat fixed !important; }
 
 /* ---------- 今天的小卡片 ---------- */
 #today-card {

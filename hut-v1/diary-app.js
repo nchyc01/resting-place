@@ -30,7 +30,7 @@ const diaryApp = {
                 
                 <!-- iframe容器 -->
                 <div id="diary-iframe-container" style="width: 100%; height: 400px; margin-top: 20px; display: none;">
-                    <iframe id="diary-iframe" src="diary-iframe.html" style="width: 100%; height: 100%; border: none; border-radius: 10px;"></iframe>
+                    <iframe id="diary-iframe" src="../diary-iframe.html" style="width: 100%; height: 100%; border: none; border-radius: 10px;"></iframe>
                 </div>
                 
                 <div style="margin-top: 20px; font-size: 12px; color: #b8a2ff;">
@@ -55,7 +55,7 @@ const diaryApp = {
             iframeContainer.style.display = 'block';
             
             // 加载日记本iframe
-            iframe.src = 'diary-iframe.html';
+            iframe.src = '../diary-iframe.html';
             
             utils.showNotification('正在加载日记本...', 'info');
         } else {
