@@ -54,10 +54,23 @@
         document.body.appendChild(layer);
     }
 
-    window.initGalleryApp = function () {
+    function init() {
         document.addEventListener('appOpened', function (e) {
             if (e.detail && e.detail.appName === 'gallery') build();
         });
         build();
-    };
+        // 地址后面带 #gallery 就能直接打开画廊（方便做书签，也方便小夜自己检查）
+        if (location.hash === '#gallery') {
+            try { windowSystem.openApp('gallery'); } catch (err) {}
+        }
+    }
+
+    window.initGalleryApp = init;
+
+    // 自己也可以启动：万一 index.html 里忘了调 initGalleryApp 也不会白屏
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 })();
