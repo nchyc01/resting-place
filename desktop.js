@@ -2,10 +2,11 @@
 // 桌面上的图标可以随意拖；右键图标可以"固定到左侧"；左侧只显示固定过的应用。
 
 (function () {
-    const POS_KEY = 'hut-icon-pos-v1';
+    const POS_KEY = 'hut-icon-pos-v2';
     const PIN_KEY = 'hut-pinned-v1';
     const GRID_KEY = 'hut-grid-on-v1';
-    const GRID_X = 96, GRID_Y = 112;
+    // 网格跟着桌面默认布局：第一格在 (50,50)，格距 100
+    const GRID_X = 100, GRID_Y = 100, GRID_ORIGIN_X = 50, GRID_ORIGIN_Y = 50;
     const DEFAULT_PINNED = ['welcome', 'music'];
 
     // 应用清单（和桌面图标对应）
@@ -35,8 +36,8 @@
         const v = load(GRID_KEY, null);
         return v === null ? true : !!v;
     }
-    function snapTo(v, size) {
-        return Math.max(0, Math.round(v / size) * size);
+    function snapTo(v, size, origin) {
+        return Math.max(0, origin + Math.round((v - origin) / size) * size);
     }
 
     function getPinned() {
@@ -169,8 +170,8 @@
                 if (!moved) return;
                 // 拖过了：先按网格吸附，再记住位置，并吞掉随后那次点击
                 if (gridOn()) {
-                    el.style.left = snapTo(el.offsetLeft, GRID_X) + 'px';
-                    el.style.top = snapTo(el.offsetTop, GRID_Y) + 'px';
+                    el.style.left = snapTo(el.offsetLeft, GRID_X, GRID_ORIGIN_X) + 'px';
+                    el.style.top = snapTo(el.offsetTop, GRID_Y, GRID_ORIGIN_Y) + 'px';
                 }
                 const pos = load(POS_KEY, {});
                 pos[app] = { left: el.style.left, top: el.style.top };
