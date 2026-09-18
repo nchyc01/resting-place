@@ -1,0 +1,3280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="manifest" href="./manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="小夜旅行">
+<title>小夜的旅行 · 休憩之所</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #1a1028;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  font-family: 'Noto Serif SC', serif;
+  padding: 20px;
+}
+
+.game-container {
+  width: 520px;
+  background: linear-gradient(170deg, #fcf6ec 0%, #f3eadc 100%);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px #c4b898 inset;
+  overflow: hidden;
+  min-height: 600px;
+  transition: filter 0.8s ease;
+}
+
+.game-container.fog-mode {
+  filter: grayscale(0.5) brightness(0.75);
+  position: relative;
+}
+
+.game-container.fog-mode::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 10;
+  background: radial-gradient(ellipse at 30% 50%, transparent 30%, rgba(180,170,160,0.15) 70%);
+  animation: fogDrift 12s ease-in-out infinite alternate;
+}
+
+.game-container.fog-boss {
+  filter: grayscale(0.4) brightness(0.5) sepia(0.2);
+  position: relative;
+}
+
+.game-container.fog-boss::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 10;
+  background: radial-gradient(ellipse at 50% 40%, transparent 20%, rgba(100,80,120,0.25) 70%);
+  animation: fogDrift 8s ease-in-out infinite alternate;
+}
+
+.game-container.sun-mode {
+  filter: none;
+}
+
+@keyframes fogDrift {
+  0% { transform: translateX(-5%) scale(1); opacity: 0.6; }
+  50% { transform: translateX(3%) scale(1.05); opacity: 0.9; }
+  100% { transform: translateX(5%) scale(0.95); opacity: 0.6; }
+}
+
+.header {
+  background: linear-gradient(135deg, #3a2450, #2a1a3a);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-title { color: #e8dcc8; font-size: 20px; font-weight: 900; letter-spacing: 3px; }
+.header-sub { color: #a08870; font-size: 12px; }
+
+.main-area {
+  padding: 24px;
+  min-height: 400px;
+  position: relative;
+}
+
+/* 小夜状态区 */
+.ye-status {
+  text-align: center;
+  padding: 16px;
+  background: #f0e6d8;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.ye-avatar {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 8px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #d4b896;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ye-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ye-name { font-size: 18px; font-weight: 900; color: #2a1a3a; }
+.ye-state { font-size: 14px; color: #8b7355; margin-top: 4px; }
+.ye-location { font-size: 13px; color: #a08870; margin-top: 2px; }
+
+/* 倒计时 */
+.timer-area {
+  text-align: center;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.timer-label { font-size: 13px; color: #8b7355; }
+.timer-count { font-size: 28px; font-weight: 900; color: #3a2450; letter-spacing: 2px; }
+
+/* 消息区域 */
+.message-area {
+  background: #fffbf5;
+  border: 1px solid #d4c5a0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  min-height: 80px;
+}
+
+.message-text {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #3a2a1a;
+}
+
+/* 明信片卡片 */
+.postcard {
+  background: linear-gradient(145deg, #f5ede0, #fdf8f0);
+  border: 1px solid #d4c5a0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.postcard-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #3a2450;
+  margin-bottom: 4px;
+}
+
+.postcard-from {
+  font-size: 12px;
+  color: #a08870;
+  margin-bottom: 8px;
+}
+
+.postcard-text {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #3a2a1a;
+}
+
+/* 收集品网格 */
+.collection-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.collection-item {
+  background: #f0e6d8;
+  border: 1px solid #d4c5a0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #3a2a1a;
+}
+
+.collection-item .item-icon { margin-right: 4px; }
+.album-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 10px; }
+.album-item { display: flex; flex-direction: column; align-items: center; padding: 6px; border-radius: 8px; background: rgba(255,255,255,0.05); transition: 0.2s; }
+.album-item:hover { background: rgba(255,255,255,0.12); }
+.album-icon { width: 40px; height: 40px; object-fit: contain; border-radius: 4px; }
+.album-placeholder { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #887a60; background: rgba(255,255,255,0.05); border-radius: 4px; }
+.album-name { font-size: 10px; color: #d4c5a0; text-align: center; margin-top: 3px; line-height: 1.2; }
+.album-name.missing { color: #887a60; }
+
+/* 明信片图片 */
+.postcard-image {
+  margin: -16px -16px 12px -16px;
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+}
+
+.postcard-image img {
+  width: 100%;
+  height: 320px;
+  display: block;
+  object-fit: cover;
+  object-position: center 12%;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.postcard-image img:hover {
+  filter: brightness(0.95);
+}
+
+/* 全图查看灯箱 */
+.lightbox {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(10, 6, 20, 0.92);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  cursor: zoom-out;
+}
+
+.lightbox.active {
+  display: flex;
+}
+
+.lightbox img {
+  max-width: 100%;
+  max-height: 95vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 10px 60px rgba(0,0,0,0.6);
+  cursor: default;
+}
+
+.lightbox-close {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  font-size: 32px;
+  color: #e8dcc8;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  line-height: 1;
+  z-index: 10000;
+}
+
+.lightbox-close:hover {
+  opacity: 1;
+}
+
+@keyframes lightboxFadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.lightbox.active img {
+  animation: lightboxFadeIn 0.25s ease;
+}
+
+/* 按钮 */
+.action-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #3a2450, #2a1a3a);
+  color: #e8dcc8;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-family: 'Noto Serif SC', serif;
+  cursor: pointer;
+  transition: all 0.3s;
+  letter-spacing: 1px;
+  width: 100%;
+}
+
+.action-btn:hover { background: linear-gradient(135deg, #4a3060, #3a2450); }
+.action-btn:disabled { background: #c4b8a0; color: #a08870; cursor: default; }
+
+/* 页脚选项卡 */
+.tabs {
+  display: flex;
+  border-top: 1px solid #d4c5a0;
+  background: #f5ede0;
+}
+
+.tab {
+  flex: 1;
+  padding: 12px;
+  text-align: center;
+  font-size: 13px;
+  color: #8b7355;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 3px solid transparent;
+}
+
+.tab:hover { background: #f0e6d8; }
+.tab.active { color: #3a2450; border-bottom-color: #3a2450; font-weight: 700; }
+
+.tab-content { display: none; padding: 16px 24px; }
+.tab-content.active { display: block; }
+
+.footer {
+  background: #2a1a3a;
+  padding: 10px 24px;
+  text-align: center;
+}
+
+.footer-text { color: #5a4a3a; font-size: 11px; }
+
+/* 进度条 */
+.progress-bar {
+  height: 4px;
+  background: #d4c5a0;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8ba86a, #5a7a4a);
+  border-radius: 2px;
+  transition: width 1s;
+}
+
+/* 动画 */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.floating { animation: float 3s ease-in-out infinite; }
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-slide { animation: fadeSlideIn 0.6s ease; }
+</style>
+</head>
+<body>
+<div class="game-container">
+  <div class="header">
+    <span class="header-title">小夜的旅行</span>
+    <span class="header-sub">休憩之所 · 挂机版</span>
+  </div>
+
+  <div class="main-area">
+    <!-- 小夜状态 -->
+    <div class="ye-status">
+      <div class="ye-avatar" id="avatarContainer">
+        <img id="avatarImg" src="./happy.webp" alt="小夜" style="display:none;">
+        <span id="avatarFallback" style="font-size:48px;">🐭</span>
+      </div>
+      <div class="ye-name">小夜 · 鸢尾夜</div>
+      <div class="ye-state" id="yeState">准备出发</div>
+      <div class="ye-location" id="yeLocation">休憩之所</div>
+    </div>
+
+    <!-- 计时器 -->
+    <div class="timer-area">
+      <div class="timer-label" id="timerLabel">下次旅行还有</div>
+      <div class="timer-count" id="timerCount">--:--</div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+
+    <!-- 消息/故事区 -->
+    <div class="message-area" id="messageArea">
+      <div class="message-text" id="messageText">按下面的按钮，让小夜出发去旅行吧～吱🫶</div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <button class="action-btn" id="actionBtn" onclick="sendYe()">送小夜出发！</button>
+
+    <!-- 保存/加载 -->
+    <div style="display:flex; gap:8px; margin-top:8px;">
+      <button class="action-btn" style="flex:1; font-size:12px; padding:8px; background:#5a4a3a;" onclick="saveProgress()">💾 保存进度</button>
+      <button class="action-btn" style="flex:1; font-size:12px; padding:8px; background:#5a4a3a;" onclick="document.getElementById('loadFileInput').click()">📂 读取进度</button>
+      <input type="file" id="loadFileInput" accept=".json" style="display:none" onchange="loadProgress(event)">
+    </div>
+    
+    <!-- 重置 -->
+    <div style="display:flex; gap:8px; margin-top:8px;">
+      <button class="action-btn" id="resetBtn" style="flex:1; font-size:12px; padding:8px; background:#6a3a3a;" onclick="confirmReset()">🗑️ 删档重玩</button>
+    </div>
+
+    <!-- 提示 -->
+    <div style="margin-top:8px; text-align:center;">
+      <span style="font-size:12px; color:#a08870;" id="hintText">小夜会去不同的世界旅行，带回明信片和特产哦</span>
+    </div>
+  </div>
+
+  <!-- 选项卡 -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('postcards')">🏷️ 明信片</div>
+    <div class="tab" onclick="switchTab('stats')">📊 能力</div>
+    <div class="tab" onclick="switchTab('equipment')">🎒 装备</div>
+    <div class="tab" onclick="switchTab('album')">📖 图鉴</div>
+  </div>
+
+  <div class="tab-content active fade-slide" id="tab-postcards"></div>
+  <div class="tab-content" id="tab-stats"></div>
+  <div class="tab-content" id="tab-equipment"></div>
+  <div class="tab-content" id="tab-album"></div>
+
+  <div class="footer">
+    <span class="footer-text">小夜旅行的世界 · 每一次都是新的故事</span>
+  </div>
+</div>
+
+<script>
+// ========== 目的地数据 ==========
+const destinations = [
+  { name: "圣巢 · 王后花园", world: "空洞骑士", desc: "到处是盛开的荆棘花和飞舞的蝴蝶，空气中飘着淡淡的花粉香", items: ["荆棘花瓣", "蝶翼粉末", "古老歌谣碎片", "蝴蝶鳞粉瓶", "花后祝福"] /*5*/, img: "queens_gardens" },
+  { name: "圣巢 · 蓝湖", world: "空洞骑士", desc: "宁静的湖水映着天光，湖边插着一把剑，旁边有一顶旧面具", items: ["湖水碎片", "旧面具残片", "宁静之歌", "湖底鹅卵石", "倒影水晶"] /*5*/, img: "blue_lake" },
+  { name: "罗德兰 · 亚诺尔隆德", world: "黑暗之魂", desc: "雄伟的教堂之城在夕阳下闪着金色的光，银骑士在城墙上巡逻", items: ["银色碎片", "太阳徽记", "古老盾牌残片", "教堂玻璃碎", "骑士纽扣"] /*5*/, img: "anor_londo" },
+  { name: "罗德兰 · 防火女祭坛", world: "黑暗之魂", desc: "营火在寂静中燃烧，一个防火女轻抚着火焰，似乎在等待什么", items: ["余烬火花", "防火女的泪滴", "营火灰烬", "熏黑的羽毛", "蜡封祈祷词"] /*5*/, img: "firekeeper_shrine" },
+  { name: "魔女之国 · 和平国洛贝塔", world: "魔女之旅", desc: "一个宁静的小国，田野里开着紫色的花，远处有魔女骑着扫帚飞过", items: ["薰衣草干花", "魔女饼干", "星形护身符", "扫帚尾须", "花香信纸"] /*5*/, img: "lobeta" },
+  { name: "魔女之国 · 时钟乡", world: "魔女之旅", desc: "到处都是巨大的钟表，时间的流逝在这里变得可视化", items: ["齿轮碎片", "怀表链条", "时针别针", "计时沙漏", "发条钥匙"] /*5*/, img: "clock_town" },
+  { name: "休憩之所 · 森林分所", world: "小夜的秘密", desc: "树洞里藏着一个小小的房间，有炉火和书架，像是休憩之所在另一个世界的投影", items: ["橡果吊坠", "树汁墨水", "苔藓标本", "干花书签", "树脂封存的萤火虫"] /*5*/, img: "forest_branch" },
+  { name: "无名之国 · 巨人陨落之森", world: "黑暗之魂", desc: "巨大的枯树与石像矗立在雾气中，远处有巨人的轮廓缓缓移动", items: ["巨人石碎片", "雾之结晶", "巨木年轮", "铁锈箭镞", "雾中花瓣"] /*5*/, img: "giants_forest" },
+  { name: "环世界 · 冻原", world: "环世界", desc: "一望无际的冰原，偶尔能看到因纽特风格的帐篷和雪地鼠族村落", items: ["冰晶石", "雪鼠毛绒球", "冻原蜂蜜", "鲸骨雕刻", "极光色线团"] /*5*/, img: "tundra" },
+  { name: "深海 · 沉没之城", world: "深海", desc: "古老的城市沉在幽蓝的海底，发光的鱼群在建筑之间穿梭，美丽又孤寂", items: ["发光珍珠", "珊瑚碎片", "深海回音螺", "沉船铜币", "海妖鳞片"] /*5*/, img: "sunken_city" },
+  { name: "圣巢 · 泪水之城", world: "空洞骑士", desc: "永远下着雨的城市，悲伤而美丽，水面的灯光倒映着残破的宫殿", items: ["泪水结晶", "雨滴风铃", "古老城市地图碎片", "湿透的信", "灵魂余响"] /*5*/, img: "city_of_tears" },
+  { name: "罗德兰 · 绘画世界", world: "黑暗之魂", desc: "一个被雪覆盖的寂静世界，仿佛时间在这里停止，远处有乌鸦在飞", items: ["雪花结晶", "乌鸦羽毛", "画布碎片", "冻结的泪滴", "白色蜡笔"] /*5*/, img: "painted_world" },
+  { name: "奇妙之国 · 大人之国", world: "奇诺之旅", desc: "一个奇怪的国度，孩子长到一定年龄就要接受'成为大人'的手术，失去童真和想象力，变得'懂事'", items: ["手术刀碎片", "孩子的画本", "大人证书复印件", "褪色的玩具", "无声哨子"] /*5*/, img: "land_of_adults" },
+  { name: "奇妙之国 · 温柔之国", world: "奇诺之旅", desc: "这个国家的人们从不生气，从不争吵，永远面带微笑——直到奇诺发现微笑背后的真相", items: ["假面碎片", "无声铃铛", "染泪的手帕", "微笑指南手册", "绷紧的琴弦"] /*5*/, img: "gentle_country" },
+  { name: "罗德兰 · 传火祭祀场", world: "黑暗之魂", desc: "一座被灰烬环绕的圆形建筑，中央燃烧着初火，不死人和灰烬英雄们聚集在此", items: ["祭祀场灰烬", "螺旋剑碎片", "防火女眼眸", "古老钟锤", "熄灭的烛台"] /*5*/, img: "firelink_shrine" },
+  { name: "圣巢 · 水晶山峰", world: "空洞骑士", desc: "整座山都由发光水晶构成，晶莹剔透的光芒在隧道中折射，美得让人移不开眼", items: ["水晶碎片", "发光棱镜", "矿工头灯", "水晶髓液", "折射之眼"] /*5*/, img: "crystal_peak" },
+
+  { name: "终末世界 · 雪原浴池", world: "少女终末旅行", desc: "白雪覆盖的废墟中，竟然藏着一个还能冒出热气的浴池。小夜在这里泡了个舒服的热水澡，外面的暴风雪仿佛也变得温柔了。", items: ["融雪毛巾", "浴池木塞", "热蒸汽结晶", "肥皂碎片", "温热回忆"] /*5*/, img: "snow_bath" },
+  { name: "终末世界 · 街灯都市", world: "少女终末旅行", desc: "深不见底的多层都市中，一盏盏街灯像星星一样点缀在废墟之间。地上散落着画了一半的地图，画地图的人已经不在了。", items: ["旧地图碎片", "街灯灯泡", "用过的铅笔", "城市指南书", "标记贴纸"] /*5*/, img: "streetlamp_city" },
+  { name: "终末世界 · 飞行塔", world: "少女终末旅行", desc: "一座高塔中，未完成的飞机骨架静静立着，零件散落一地。塔顶晾着风干的鱼，窗外偶尔有风吹过金属的声音。", items: ["飞机螺丝", "风干鱼干", "飞行图纸", "工具零件", "塔顶风向标"] /*5*/, img: "flight_tower" },
+  { name: "终末世界 · 螺旋阶梯", world: "少女终末旅行", desc: "通往城市上层的巨大螺旋阶梯，一圈一圈仿佛没有尽头。只有脚步声在空旷中回荡，每走一圈都能看到不同的风景。", items: ["阶梯碎石", "扶手铁锈", "上层空气瓶", "回音贝壳", "攀登稻草绳"] /*5*/, img: "spiral_stairs" },
+  { name: "终末世界 · 顶层雪原", world: "少女终末旅行", desc: "终于到达了最顶层。没有想象中的繁华城市，只有一望无际的雪原和一块方正的巨石。安静得只剩下风声。", items: ["雪原冰晶", "日出暖石", "雪球样本", "空白日记", "终末之风"] /*5*/, img: "top_snowfield" },
+  { name: "妖精之国 · 楠木村", world: "人类衰退之后", desc: "一个宁静的小村庄，桌上摆着手工饼干和红茶，像是主人刚刚离开。窗外可以看到远处的小山丘，空气中还残留着甜甜的香气。", items: ["手工曲奇", "妖精糖罐", "红茶杯", "楠木树叶标本", "妖精的小帽子"] /*5*/, img: "nanaki_village" },
+  { name: "妖精之国 · 秘密工厂", world: "人类衰退之后", desc: "一座由各种奇怪零件搭建的工厂，传送带上还有未完成的…什么？机器还在嗡嗡响，但操作台上一个人也没有。", items: ["奇怪零件", "妖精尺寸扳手", "不明机器说明书", "多余螺丝", "未完成品"] /*5*/, img: "secret_factory" },
+  { name: "妖精之国 · 砂糖森林", world: "人类衰退之后", desc: "一片神奇的森林，树上结满了糖果和点心，连小溪流的是蜂蜜。空气中漫着甜味，像走进了一个吃不完的甜点世界。", items: ["棒棒糖花", "巧克力树果", "棉花糖云", "砂糖结晶", "妖精的食谱"] /*5*/, img: "sugar_forest" },
+  { name: "中土 · 夏尔郡", world: "指环王", desc: "绿草如茵的丘陵上，圆圆的袋底洞门散落在山坡间。烟圈飘向蓝天，宴会树下还留着庆典的装饰，生活在这里只关于美食和好天气。", items: ["夏尔烟叶", "蜂蜜酒", "袋底洞钥匙扣", "宴会树花瓣", "霍比特食谱"] /*5*/, img: "the_shire" },
+  { name: "中土 · 瑞文戴尔", world: "指环王", desc: "精灵的最后一处庇护所，瀑布从峡谷中倾泻而下。古老的石桥跨越溪流，厅堂里安静得只剩风声，时间在这里仿佛静止了。", items: ["精灵树叶", "瀑布露珠", "古老诗歌抄本", "暮星碎片", "埃尔隆德的药水"] /*5*/, img: "rivendell" },
+
+  // === 休憩之所 新地点 ===
+  { name: "休憩之所 · 炉火大厅", world: "小夜的秘密", desc: "温暖的壁炉噼啪作响，厚厚的地毯上放着软垫，木头桌子上摆着热可可，整个大厅散发着松木和篝火的香气，是小夜最爱窝着的地方。", items: ["炉火余温石", "热可可杯", "羊毛毯角", "壁炉木柴香", "晚安故事书"] /*5*/, img: "hearth_hall" },
+  { name: "休憩之所 · 记忆回廊", world: "小夜的秘密", desc: "一条长长的走廊，墙上挂满了旅行的照片和明信片，架子上摆着从各地带回来的小纪念品。每走一步都能回忆起一段旅途的点点滴滴。", items: ["旧车票存根", "旅行相片碎片", "干花书签", "手写明信片", "记忆水晶球"] /*5*/, img: "memory_hall" },
+  { name: "休憩之所 · 温泉小院", world: "小夜的秘密", desc: "竹篱笆围着一个小小的露天温泉，热气在晚风中袅袅升起，柚子香包浮在水面上，围墙上挂着暖黄色的纸灯笼，安静又治愈。", items: ["温泉馒头", "竹筒水勺", "柚子香包", "温泉蛋", "毛巾小兔"] /*5*/, img: "hot_spring" },
+  { name: "休憩之所 · 星空露台", world: "小夜的秘密", desc: "屋顶上的小木平台，放着两张摇椅和一盏暖灯。抬头就能看到整条银河横跨天际，偶尔有流星划过，是和小夜一起看星星的最好地方。", items: ["星座图碎片", "月光瓶", "星沙计时器", "夜风风铃", "流星许愿石"] /*5*/, img: "star_terrace" },
+  { name: "休憩之所 · 藏书阁", world: "小夜的秘密", desc: "高到天花板的书架上塞满了旧书，木梯子靠在书柜边上。窗边摆着一张软软的沙发，阳光洒进来的时候，灰尘在光线里慢慢飘，安静又惬意。", items: ["旧书签", "羽毛笔", "墨水小瓶", "皮面笔记本", "枯叶标本"] /*5*/, img: "library" },
+
+  // === 来自深渊 新地点 ===
+  { name: "深界一层 · 阿比斯之渊", world: "来自深渊", desc: "巨大的垂直洞穴边缘，城市沿崖壁而建。往下看去，深渊吞没了所有光线，只有绳梯和平台层层叠叠地消失在黑暗中。", items: ["探窟家指南书", "绳梯残段", "上升诅咒符", "深渊地图碎片", "白笛碎片"] /*5*/, img: "abyss_edge" },
+  { name: "深界四层 · 巨人之杯", world: "来自深渊", desc: "巨大的天台蔓植物从深渊深处生长出来，像树一样高耸。它们的扁平凹盘上盛着浅浅的温水，热气蒸腾，小夜就在这些巨叶之间行走。", items: ["天台蔓叶片", "暖池温泉水", "穿弹兽外壳碎片", "发光孢子", "娜娜奇香草"] /*5*/, img: "giants_goblet" },
+  { name: "深界五层 · 亡骸之海", world: "来自深渊", desc: "一片浅海，海底铺满了白色的珊瑚骨。发光的生物在水中漂浮，远处能听到奇异的鸣叫声。空气中有盐的味道，也有某种说不清的孤寂。", items: ["珊瑚骨片", "发光水母瓶", "龙鬃螺鸠鳞片", "深海盐结晶", "不灭灯花"] /*5*/, img: "sea_of_corpses" },
+  { name: "深界六层 · 生骸村", world: "来自深渊", desc: "用骨头和废料搭成的奇异村落，紫色的天空下灯笼发出幽幽的光。村里的居民曾经是人类，但现在已经变成了另一种存在。", items: ["价值货币", "记忆之卵", "生骸面具", "甘嘉队徽章", "诅咒灯笼"] /*5*/, img: "iruburu_village" }
+];
+
+const moods = ["开心", "好奇", "兴奋", "满足", "疲惫但快乐", "很满足", "有点累", "很平静", "超级开心"];
+const moodEmojis = ["😊", "🤔", "🎉", "😌", "😴", "🥺", "😮‍💨", "😐", "🥳"];
+
+// ========== 状态管理 ==========
+const STATE = {
+  IDLE: "idle",        // 在家
+  TRAVELING: "travel", // 在路上
+  ARRIVED: "arrived",  // 到达了
+  RETURNING: "return", // 回程
+  FOG: "fog",         // 迷雾模式
+  TRAINING: "train"   // 锻炼模式
+};
+
+let state = STATE.IDLE;
+let currentDest = null;
+let travelTimer = null;
+let timeRemaining = 0;
+let totalTime = 0;
+let travelStartTime = 0; // 真实时间戳
+let journeyLog = JSON.parse(localStorage.getItem("yeJourneyLog") || "[]");
+let postcardCollection = JSON.parse(localStorage.getItem("yePostcards") || "[]");
+
+// 兼容旧存档：给旧明信片补充新字段
+for (const pc of postcardCollection) {
+  if (pc.events === undefined) pc.events = [];
+  if (pc.expGained === undefined) pc.expGained = 0;
+  if (pc.newAccessories === undefined) pc.newAccessories = [];
+}
+let souvenirCollection = JSON.parse(localStorage.getItem("yeSouvenirs") || "[]");
+let lastTravelStory = null;
+let lastDestName = null;
+
+// ========== 属性系统 ==========
+
+const STAT_NAMES = { str: "力量", dex: "敏捷", int: "智慧", cha: "魅力" };
+
+function getDefaultStats() {
+  return {
+    level: { str: 1, dex: 1, int: 1, cha: 1 },
+    exp: { str: 0, dex: 0, int: 0, cha: 0 },
+    equipment: [null, null],
+    backpack: []
+  };
+}
+
+let yeStats = JSON.parse(localStorage.getItem("yeStats") || "null") || getDefaultStats();
+
+function saveYeStats() {
+  localStorage.setItem("yeStats", JSON.stringify(yeStats));
+}
+
+function getStatValue(stat) {
+  let base = 4 + (yeStats.level[stat] || 1);
+  (yeStats.equipment || []).forEach(eq => {
+    if (eq && eq.stat === stat) base += eq.bonus;
+  });
+  return base;
+}
+
+function getExpToNext(stat) { return ((yeStats.level[stat] || 1) * 100 + 50); }
+
+function addStatExp(stat, amount) {
+  if (!stat || amount <= 0) return;
+  yeStats.exp[stat] = (yeStats.exp[stat] || 0) + amount;
+  const needed = getExpToNext(stat);
+  while (yeStats.exp[stat] >= needed) {
+    yeStats.exp[stat] -= needed;
+    yeStats.level[stat]++;
+  }
+  saveYeStats();
+}
+
+function rollD6() { return Math.floor(Math.random() * 6) + 1; }
+
+// ========== 世界难度加成 ==========
+// 每个世界有基础难度偏移，让挑战性随世界变化
+const worldDifficulty = {
+  "小夜的秘密": 0,   // 新手区，适合练级
+  "奇诺之旅": 0,
+  "魔女之旅": 0,
+  "环世界": 0,
+  "空洞骑士": 1,
+  "人类衰退之后": 1,
+  "少女终末旅行": 1,
+  "指环王": 1,
+  "深海": 1,
+  "黑暗之魂": 2,    // 硬核世界
+  "来自深渊": 2      // 硬核世界
+};
+
+function getDifficultyLabel(diff) {
+  if (diff <= 7) return "🌱普通";
+  if (diff <= 9) return "🔥困难";
+  return "💀高危";
+}
+
+// ========== 事件系统 ==========
+
+const eventPools = {
+  "休憩之所 · 炉火大厅": [
+    {
+      id: "hearth_fire_out", name: "壁炉熄灭了",
+      desc: "壁炉的火突然熄灭了，房间开始变冷……",
+      stat: "int", difficulty: 7,
+      successText: "小夜找到了一些干木柴和火绒，熟练地重新点燃了壁炉。",
+      failText: "木头有点潮，小夜试了好几次都没点着，只好裹着毯子等火自己燃起来……",
+      accessory: { name: "暖炉守护符", stat: "int", bonus: 2, desc: "被壁炉温暖祝福过的小石头" }
+    },
+    {
+      id: "hearth_log_pile", name: "倒下的木柴堆",
+      desc: "壁炉边的木柴堆哗啦一声倒了，好像压到了什么东西……",
+      stat: "str", difficulty: 6,
+      successText: "小夜用力把倒下的木柴搬开，发现底下压着一颗亮晶晶的小石子。",
+      failText: "木柴太重了，小夜搬不动，只好绕到旁边捡了几根细的添进火里。"
+    },
+    {
+      id: "hearth_visitor", name: "意外的访客",
+      desc: "门外传来轻轻的抓挠声，好像有什么小动物在门外……",
+      stat: "cha", difficulty: 7,
+      successText: "小夜轻轻打开门，一只冻坏的小松鼠跑了进来。小夜给它喂了点面包屑，它暖暖身子就走了。",
+      failText: "小夜打开门的动静太大，小动物被吓跑了，只留下一串小小的脚印消失在雪地里。"
+    },
+    {
+      id: "hearth_old_letter", name: "旧信封",
+      desc: "在壁炉的砖缝里发现了一个泛黄的信封，里面似乎装着什么东西……",
+      stat: "int", difficulty: 8,
+      successText: "小夜小心翼翼地拆开信封，里面是一张手绘的地图碎片，标注着某个神秘的地点。",
+      failText: "信封太脆了，一碰就碎成了几片，什么也没看清……"
+    },
+    {
+      id: "hearth_warm_story", name: "炉火边的故事",
+      desc: "炉火噼啪作响，火光在墙上投出跳动的影子，小夜想起了什么……",
+      stat: "cha", difficulty: 5,
+      successText: "小夜坐在炉火边，自言自语地讲了一个小时候听过的故事，讲着讲着心情就好了起来。",
+      failText: "小夜盯着火焰发呆，想了半天也没想出什么有趣的故事，只好安静地坐着。"
+    },
+    {
+      id: "hearth_ember", name: "将熄的炭火",
+      desc: "炉火渐渐变小了，需要加柴才能维持。但木柴不多了……",
+      stat: "str", difficulty: 7,
+      successText: "小夜机智地把几根细柴架在大柴上，很快火又旺了起来。",
+      failText: "小夜一股脑把所有木柴都塞了进去，火反而被压得更小了……"
+    }
+  ],
+
+  "休憩之所 · 记忆回廊": [
+    {
+      id: "memory_torn_photo", name: "撕碎的照片",
+      desc: "走廊尽头有一张被撕成两半的照片，捡起来一看，照片上的人影很模糊……",
+      stat: "int", difficulty: 7,
+      successText: "小夜把照片拼在一起，认出了照片里的地方——那是曾经去过的一个美丽的地方。",
+      failText: "照片碎得太厉害了，小夜拼了半天也没看出是什么，只好放回了架子上。",
+      accessory: { name: "旅途相册", stat: "cha", bonus: 2, desc: "装满回忆的小相册" }
+    },
+    {
+      id: "memory_dusty_shelf", name: "积灰的架子",
+      desc: "走廊高处有个格子积满了灰，好像很久没人碰过了。小夜踮起脚尖想看个究竟……",
+      stat: "dex", difficulty: 7,
+      successText: "小夜灵活地爬上去，发现格子里藏着一枚小小的纪念徽章。",
+      failText: "小夜够了好几次都差一点，最后搬了把椅子才勉强够到，结果只找到一堆灰。"
+    },
+    {
+      id: "memory_strange_key", name: "陌生的钥匙",
+      desc: "墙角的挂钩上挂着一把不认识的旧钥匙，上面贴着标签：'某处'……",
+      stat: "int", difficulty: 8,
+      successText: "小夜若有所思地看着这把钥匙——也许终有一天会知道它开的是哪扇门。",
+      failText: "小夜拿着钥匙翻来覆去地看，完全想不起来这是哪里的钥匙，又挂了回去。"
+    },
+    {
+      id: "memory_dream_echo", name: "记忆的回响",
+      desc: "走在回廊里，小夜忽然觉得某个角落特别熟悉，好像在哪里见过……",
+      stat: "cha", difficulty: 5,
+      successText: "小夜闭上眼睛感受了一下——原来是上次旅行的记忆还在微微发光呢。",
+      failText: "小夜努力回忆了半天，什么也没想起来，只好挠挠头继续往前走。"
+    },
+    {
+      id: "memory_fallen_frame", name: "歪倒的相框",
+      desc: "一个相框歪了，里面的照片滑了出来，掉在地上……",
+      stat: "dex", difficulty: 6,
+      successText: "小夜眼疾手快接住了照片，轻轻吹掉灰重新放了回去。",
+      failText: "小夜没来得及接住，照片落在了地上又沾了点灰，还好没有弄坏。"
+    }
+  ],
+
+  "休憩之所 · 温泉小院": [
+    {
+      id: "spring_temp", name: "水温不对",
+      desc: "今晚的温泉水温有点偏凉，需要加点热汤才行……",
+      stat: "int", difficulty: 6,
+      successText: "小夜找到了温泉水阀，调了一下温度，不一会儿热气就冒上来了。",
+      failText: "小夜研究了半天阀门怎么拧，最后也没搞懂原理，只好将就着泡了。",
+      accessory: { name: "柚子香囊", stat: "cha", bonus: 2, desc: "散发着柚子清香的香囊" }
+    },
+    {
+      id: "spring_leaf", name: "飘落的竹叶",
+      desc: "一片竹叶飘到了水面上，纹路清晰得像是被人刻意留下的……",
+      stat: "cha", difficulty: 7,
+      successText: "小夜捡起竹叶，发现上面写着几个小字——'来自远方的问候'。",
+      failText: "小夜想捞起竹叶，结果竹叶顺着水流飘走了，消失在出水口。"
+    },
+    {
+      id: "spring_stars", name: "星空倒影",
+      desc: "仰面泡在温泉里，水面上倒映着星空，美得让小夜发起了呆……",
+      stat: "int", difficulty: 5,
+      successText: "小夜数着水里的星星，忽然认出其中一颗是小时候听外婆故事里的那颗。",
+      failText: "小夜看着看着就犯困了，差点在水里睡着。"
+    },
+    {
+      id: "spring_bamboo_noise", name: "竹筒的声响",
+      desc: "院角的竹筒敲石声响了一下又一下，好像在提醒着什么……",
+      stat: "dex", difficulty: 7,
+      successText: "小夜顺着声音走过去，在竹筒下面发现了一个被水冲出来的小物件。",
+      failText: "小夜走过去的时候不小心踩滑了，差点摔一跤，什么也没发现。"
+    },
+    {
+      id: "spring_frog", name: "温泉里的青蛙",
+      desc: "一只小青蛙不知怎么掉进了温泉里，正在水里扑腾……",
+      stat: "str", difficulty: 5,
+      successText: "小夜伸手把青蛙捞了出来，放在旁边的石头上，青蛙呱呱叫了两声好像在说谢谢。",
+      failText: "小夜伸手去捞，青蛙反而跳得更远了，在水里急得团团转。"
+    }
+  ],
+
+  "休憩之所 · 星空露台": [
+    {
+      id: "star_shooting", name: "流星来了",
+      desc: "一颗明亮的流星划过天际，小夜赶紧闭上眼睛许了个愿……",
+      stat: "cha", difficulty: 6,
+      successText: "小夜在心里默默许了个愿——希望能看到更多流星。",
+      failText: "流星太快了，小夜还没来得及许愿就已经消失了。",
+      accessory: { name: "星图碎片", stat: "int", bonus: 2, desc: "画着神秘星座的碎片" }
+    },
+    {
+      id: "star_constellation", name: "认星座",
+      desc: "今晚的星星特别多，小夜试着在天空中找出认识的星座……",
+      stat: "int", difficulty: 7,
+      successText: "小夜找到了猎户座和大熊座，还在它们旁边发现了一个没见过的星座。",
+      failText: "星星太多了，小夜看得眼花缭乱，一个星座也没认出来。"
+    },
+    {
+      id: "star_wind", name: "夜风中的信",
+      desc: "一阵夜风吹来，带来了什么东西轻轻落在露台地板上的声音……",
+      stat: "dex", difficulty: 6,
+      successText: "小夜循声找过去，发现是一片闪着微光的羽毛，不知是什么鸟留下的。",
+      failText: "风太大了，小夜被吹得眯起了眼睛，什么也没找到。"
+    },
+    {
+      id: "star_lantern", name: "灯笼熄了",
+      desc: "露台上的暖灯突然熄了一盏，周围的夜色一下子就浓了起来……",
+      stat: "str", difficulty: 5,
+      successText: "小夜摸索着找到了灯笼，轻轻晃了晃，灯又亮了起来。",
+      failText: "小夜摸黑折腾了半天，最后发现是没油了。"
+    },
+    {
+      id: "star_distant_light", name: "远方的灯火",
+      desc: "站在露台上眺望远方，天边有一处微弱的灯火在闪烁……",
+      stat: "cha", difficulty: 8,
+      successText: "小夜盯着那盏灯火看了很久，心想那里一定也有谁在看星星吧。",
+      failText: "灯火忽明忽暗，小夜揉了揉眼睛，再看时已经消失了。"
+    }
+  ],
+
+  "休憩之所 · 藏书阁": [
+    {
+      id: "library_falling_book", name: "掉落的大书",
+      desc: "一本厚厚的书从书架上滑了出来，啪的一声掉在地上……",
+      stat: "str", difficulty: 6,
+      successText: "小夜弯腰把书捡起来，发现里面夹着一片压了很久的枫叶书签。",
+      failText: "书太重了，小夜弯腰捡的时候手滑了一下，书又掉了下去，差点砸到脚。",
+      accessory: { name: "古老书签", stat: "int", bonus: 3, desc: "夹在古书中的手写书签" }
+    },
+    {
+      id: "library_mystery_page", name: "缺页的书",
+      desc: "小夜翻到一本有趣的书，但关键的一页被人撕掉了……",
+      stat: "int", difficulty: 8,
+      successText: "小夜仔细看了看撕口，发现不是被撕掉的，而是藏页！里面夹着一小张手绘地图。",
+      failText: "小夜翻遍了整本书也没找到缺失的那页，只好遗憾地放了回去。"
+    },
+    {
+      id: "library_sunbeam", name: "阳光下的尘埃",
+      desc: "午后的阳光穿过窗户洒进来，光柱里的尘埃像星星一样缓缓飘动……",
+      stat: "cha", difficulty: 5,
+      successText: "小夜伸出手去接那些光里的尘埃，感觉心里特别平静。",
+      failText: "小夜看呆了，结果书从膝盖上滑了下去，惊醒了发呆的自己。"
+    },
+    {
+      id: "library_ladder", name: "晃动的梯子",
+      desc: "小夜爬上木梯想去够顶层的一本书，梯子突然晃了一下……",
+      stat: "dex", difficulty: 7,
+      successText: "小夜稳住重心，稳稳地拿到了那本书——是一本空白的日记本。",
+      failText: "梯子晃得太厉害了，小夜只好爬下来，换了个更稳的角度再试。"
+    },
+    {
+      id: "library_margins", name: "书页边缘的笔记",
+      desc: "一本书的页边有人用小小的字写满了笔记，字迹很旧了……",
+      stat: "int", difficulty: 6,
+      successText: "小夜认真读了那些笔记，像是在跟很久以前的某个人对话一样。",
+      failText: "字太小了，小夜看了半天也没看清写了什么，只知道是一种不认识的语言。"
+    }
+  ],
+
+  // === 来自深渊 事件 ===
+
+  "深界一层 · 阿比斯之渊": [
+    {
+      id: "abyss_railing", name: "松动的护栏",
+      desc: "崖边的木护栏有一截松动了，如果不修好可能会有危险……",
+      stat: "str", difficulty: 7,
+      successText: "小夜用绳子把松动的护栏重新绑好，拍了拍手确认它足够牢固。",
+      failText: "小夜试了试，绳子不够长，只好在旁边做了个标记提醒别人注意。"
+    },
+    {
+      id: "abyss_whistle", name: "远处的笛声",
+      desc: "从深渊深处隐约传来一阵悠长的笛声，像是谁在呼唤着什么……",
+      stat: "int", difficulty: 8,
+      successText: "小夜侧耳倾听，觉得那声音虽然遥远但并不令人害怕，反而像是一种问候。",
+      failText: "深渊里太暗了，小夜什么都看不清，笛声也渐渐消失了。",
+      accessory: { name: "白笛碎片", stat: "cha", bonus: 2, desc: "破碎的白笛碎片，隐约有光" }
+    },
+    {
+      id: "abyss_map", name: "被风吹走的地图",
+      desc: "一阵强风把探窟家绑在崖边的地图吹飞了，正在往深渊里飘……",
+      stat: "dex", difficulty: 7,
+      successText: "小夜一个箭步冲过去，在最后一刻抓住了地图的一角。",
+      failText: "地图已经飘得太远了，小夜只能看着它打着旋消失在黑暗中。"
+    },
+    {
+      id: "abyss_bird", name: "巨鸟的鸣叫",
+      desc: "头顶传来一声尖锐的鸣叫，一只巨大的深渊鸟类正在头顶盘旋……",
+      stat: "cha", difficulty: 6,
+      successText: "小夜保持安静，慢慢蹲下，巨鸟盘旋了几圈就飞走了。",
+      failText: "小夜被叫声吓了一跳，差点踩到崖边的石块。"
+    },
+    {
+      id: "abyss_platform", name: "破损的平台",
+      desc: "往下的绳梯平台上有一块木板已经腐朽了，需要绕过去……",
+      stat: "dex", difficulty: 6,
+      successText: "小夜小心翼翼地踩着边缘绕过了那块木板，继续往下探。",
+      failText: "小夜踩上去的时候木板嘎吱一声裂开了，还好只裂了一小块。"
+    }
+  ],
+
+  "深界四层 · 巨人之杯": [
+    {
+      id: "goblet_flat_creeper", name: "天台蔓上的露珠",
+      desc: "巨大天台蔓的盘状叶面上积着温热的浅水，水面泛着奇异的荧光……",
+      stat: "int", difficulty: 7,
+      successText: "小夜蹲下来仔细看了看，发现水里有微小的发光生物在游动，像星星落进了水里。",
+      failText: "水面太晃眼了，小夜什么也没看清，倒是踩了一脚水。",
+      accessory: { name: "穿弹兽的棘", stat: "dex", bonus: 3, desc: "穿弹兽身上脱落的锐刺" }
+    },
+    {
+      id: "goblet_leap", name: "叶间跳跃",
+      desc: "前方的两张天台蔓叶片之间隔着一段不小的距离，需要跳过去……",
+      stat: "dex", difficulty: 8,
+      successText: "小夜后退几步，助跑一跃，稳稳落在了对面的叶面上，开心得尾巴都竖起来了。",
+      failText: "距离太远了，小夜差点没够到，还好双手扒住了叶缘爬了上去。"
+    },
+    {
+      id: "goblet_monster", name: "水中的影子",
+      desc: "脚下的浅水里有一个巨大的黑影缓缓游过，散发着不祥的气息……",
+      stat: "cha", difficulty: 7,
+      successText: "小夜屏住呼吸一动不动，黑影绕了一圈就游走了。",
+      failText: "小夜太紧张了，后退时溅起了水花，黑影猛地加速游远了。"
+    },
+    {
+      id: "goblet_spores", name: "发光的孢子",
+      desc: "空气中飘来一群发光的孢子，像萤火虫一样环绕着小夜……",
+      stat: "int", difficulty: 6,
+      successText: "小夜伸出手让孢子落在掌心上，它们发出温暖的光后又随风飘走了。",
+      failText: "小夜想接住它们，但孢子太轻了，一阵微风就把它们吹散了。"
+    },
+    {
+      id: "goblet_climb", name: "垂下的藤蔓",
+      desc: "一条粗壮的藤蔓从上方垂下来，可以爬上去看看更远的地方……",
+      stat: "str", difficulty: 7,
+      successText: "小夜抓紧藤蔓用力往上爬，翻上去之后看到了整片巨人之杯的壮丽景色！",
+      failText: "藤蔓太滑了，小夜爬到一半就滑了下来，摔了个屁股蹲。"
+    }
+  ],
+
+  "深界五层 · 亡骸之海": [
+    {
+      id: "corpse_jellyfish", name: "发光水母群",
+      desc: "一群发光的透明水母从头顶缓缓飘过，把海底照得像梦境一样……",
+      stat: "int", difficulty: 6,
+      successText: "小夜仰头看着水母群，发现它们的发光规律似乎是一种信号。",
+      failText: "水母的光芒闪烁得太快了，小夜的眼睛有点花。"
+    },
+    {
+      id: "corpse_path", name: "迷失的方向",
+      desc: "海底的珊瑚骨密密麻麻，绕了几圈后小夜发现自己好像迷路了……",
+      stat: "int", difficulty: 8,
+      successText: "小夜冷静下来，用之前记下的方位标记找到了正确的路。",
+      failText: "小夜转了好几圈，最后只好沿着来时的脚印一路退了回去。"
+    },
+    {
+      id: "corpse_ruins", name: "海底遗迹",
+      desc: "海底的白色砂砾中露出了一截古老的石柱，上面刻着看不懂的文字……",
+      stat: "cha", difficulty: 7,
+      successText: "小夜轻轻触摸石柱上的刻痕，指尖感到一阵微弱的震动——像是遗迹还活着。",
+      failText: "石柱太滑了，小夜的手滑了一下，什么也没感觉到。",
+      accessory: { name: "不灭灯芯", stat: "str", bonus: 2, desc: "在海水中也不熄灭的神秘灯芯" }
+    },
+    {
+      id: "corpse_creature", name: "好奇的生物",
+      desc: "一只长得像鱼和鸟混合体的小生物好奇地围着小夜打转……",
+      stat: "cha", difficulty: 6,
+      successText: "小夜伸出手，小生物犹豫了一下，轻轻蹭了蹭她的手指。",
+      failText: "小夜一伸手，小生物就受惊跑掉了。"
+    },
+    {
+      id: "corpse_salt", name: "盐的结晶",
+      desc: "海底的岩石上结满了晶莹的盐晶，像钻石一样闪闪发光……",
+      stat: "str", difficulty: 5,
+      successText: "小夜掰下一小块盐晶带在身上，闻起来有淡淡的海的味道。",
+      failText: "盐晶太硬了，小夜掰了半天也没弄下来。"
+    }
+  ],
+
+  "深界六层 · 生骸村": [
+    {
+      id: "iruburu_trade", name: "沉默的交易",
+      desc: "一个生骸村民端坐在摊位后面，面前摆着一些看不懂的东西，似乎在等小夜交易……",
+      stat: "cha", difficulty: 8,
+      successText: "小夜拿出之前在旅途中捡到的一颗发光石子放在摊位上，生骸点了点头，推过来一枚硬币。",
+      failText: "小夜不知道该用什么交换，尴尬地笑了笑走开了。",
+      accessory: { name: "价值硬币", stat: "cha", bonus: 3, desc: "生骸村的流通货币，充满神秘价值" }
+    },
+    {
+      id: "iruburu_mask", name: "面具的凝视",
+      desc: "一排空洞的面具挂在墙上，小夜总觉得其中一只有一只眼睛在看着自己……",
+      stat: "int", difficulty: 7,
+      successText: "小夜鼓起勇气走过去仔细看了看——原来是一只小虫子趴在面具后面。",
+      failText: "小夜被盯得心里发毛，快步走过了那段路。"
+    },
+    {
+      id: "iruburu_path", name: "摇摇欲坠的桥",
+      desc: "连接两个区域之间只有一座用骨头和绳子搭的桥，看起来不太结实……",
+      stat: "dex", difficulty: 8,
+      successText: "小夜深吸一口气，轻盈地踩着骨头桥跑到了对面。",
+      failText: "小夜走到中间时桥晃了起来，她只好蹲下来抱着桥绳等它稳住。"
+    },
+    {
+      id: "iruburu_offering", name: "未知的祭品",
+      desc: "一个祭坛上摆着新鲜的水果和花朵，在这个地方显得格外突兀……",
+      stat: "int", difficulty: 7,
+      successText: "小夜意识到这是给深渊的供奉，于是合掌默默行了一礼。",
+      failText: "小夜好奇想碰一下，还好旁边有人咳嗽了一声制止了她。"
+    },
+    {
+      id: "iruburu_light", name: "灯笼熄灭",
+      desc: "村里的灯笼忽然集体暗了一瞬，所有生骸都停了下来，像是在倾听什么……",
+      stat: "cha", difficulty: 7,
+      successText: "小夜也学着生骸的样子安静下来，片刻后灯笼重新亮起，一切恢复正常。",
+      failText: "小夜被突如其来的黑暗吓了一跳，发出了声响，引来了生骸们的注视。"
+    }
+  ]
+,
+
+  // === 空洞骑士 ===
+
+  "圣巢 · 王后花园": [
+    {
+      id: "qn_garden_thorn", name: "荆棘缠路",
+      desc: "前方的花径被疯长的荆棘堵住了，细刺闪闪发光……",
+      stat: "str", difficulty: 7,
+      successText: "小夜小心地拨开荆棘，发现后面藏着一朵特别大的玫瑰花。",
+      failText: "荆棘太密了，小夜的手指被划了几下，只好绕了远路。",
+      accessory: { name: "玫瑰刺", stat: "str", bonus: 2, desc: "王后花园中最锋利的荆棘刺" }
+    },
+    {
+      id: "qn_garden_butterfly", name: "蝴蝶引路",
+      desc: "一只闪着蓝光的蝴蝶在小夜面前飞了一圈，然后往密林深处飞去……",
+      stat: "dex", difficulty: 6,
+      successText: "小夜跟着蝴蝶穿过花丛，发现了一片开满蓝色小花的神秘角落。",
+      failText: "蝴蝶飞得太快了，小夜追了几步就跟丢了。"
+    },
+    {
+      id: "qn_garden_fountain", name: "干涸的喷泉",
+      desc: "花园中央的喷泉不出水了，池底有什么东西在反光……",
+      stat: "int", difficulty: 7,
+      successText: "小夜伸手够到了那个反光的东西——是一枚精致的徽章。",
+      failText: "池子太深了，小夜趴下去也够不到底。"
+    }
+  ],
+
+  "圣巢 · 蓝湖": [
+    {
+      id: "blue_lake_sword", name: "湖中的剑",
+      desc: "湖中央插着一把剑，水面泛着奇异的涟漪……",
+      stat: "str", difficulty: 8,
+      successText: "小夜涉水走过去握住剑柄，轻轻拔了出来。剑身上刻着看不懂的文字。",
+      failText: "剑插得太紧了，小夜试了好几次都拔不出来。",
+      accessory: { name: "湖光碎片", stat: "int", bonus: 2, desc: "蓝湖水面凝结的光之碎片" }
+    },
+    {
+      id: "blue_lake_echo", name: "湖面的回音",
+      desc: "小夜对着湖面喊了一声，回音从对岸传回来，但好像多了点什么……",
+      stat: "int", difficulty: 6,
+      successText: "小夜仔细听回音，发现回音中夹杂着一丝微弱的歌声。",
+      failText: "回音乱七八糟的，小夜什么也没听清。"
+    },
+    {
+      id: "blue_lake_skipping", name: "打水漂",
+      desc: "湖边有很多扁平的石头，刚好可以打水漂玩……",
+      stat: "dex", difficulty: 5,
+      successText: "小夜扔出的石头在水面上弹了七下才沉下去，开心得拍了拍手。",
+      failText: "石头扔歪了，咚的一声直接沉了下去。"
+    }
+  ],
+
+  "圣巢 · 泪水之城": [
+    {
+      id: "tear_rain", name: "突然的大雨",
+      desc: "雨突然下大了，雨水顺着屋檐流下来，在石板路上溅起水花……",
+      stat: "dex", difficulty: 6,
+      successText: "小夜敏捷地跳到屋檐下躲雨，还顺手接了一片干净的雨水尝了尝。",
+      failText: "小夜被雨淋了个正着，衣服湿了一大片。",
+      accessory: { name: "雨泪瓶", stat: "cha", bonus: 2, desc: "装满了泪水城雨水的玻璃瓶" }
+    },
+    {
+      id: "tear_lantern_lights", name: "水中的灯光",
+      desc: "积水的路面上倒映着街灯的影子，风一吹，光影碎成了无数片……",
+      stat: "cha", difficulty: 5,
+      successText: "小夜被眼前的美景迷住了，蹲下来用手指轻轻拨动水面。",
+      failText: "小夜想拍张照，结果发现根本没带相机。"
+    },
+    {
+      id: "tear_lost_bug", name: "迷路的小虫",
+      desc: "一只发光的幼虫在路边不知所措地爬着，好像和同伴走散了……",
+      stat: "int", difficulty: 7,
+      successText: "小夜用一片叶子托起小虫，把它放到了干燥的高处。",
+      failText: "小夜刚伸手，小虫就受惊钻进了石缝里。"
+    }
+  ],
+
+  "圣巢 · 水晶山峰": [
+    {
+      id: "crystal_light_refract", name: "折射的光",
+      desc: "阳光穿过水晶，在洞壁上折射出无数道彩色的光斑……",
+      stat: "int", difficulty: 6,
+      successText: "小夜顺着光斑的指向，发现了一小块隐藏的水晶簇。",
+      failText: "光斑太晃眼了，小夜被照得睁不开眼睛。",
+      accessory: { name: "棱晶碎片", stat: "int", bonus: 2, desc: "折射出七彩光芒的水晶碎片" }
+    },
+    {
+      id: "crystal_slide_path", name: "滑溜的坡道",
+      desc: "前面的坡道被水晶粉末覆盖，又滑又亮……",
+      stat: "dex", difficulty: 7,
+      successText: "小夜干脆坐着滑了下去，又稳又好玩，像滑滑梯一样。",
+      failText: "小夜刚踩上去就滑倒了，屁股摔得有点疼……"
+    },
+    {
+      id: "crystal_narrow_tunnel", name: "狭窄的通道",
+      desc: "前方有一个很窄的裂缝，勉强能挤过去……",
+      stat: "str", difficulty: 7,
+      successText: "小夜侧着身子挤了过去，发现裂缝后面是一个隐藏的小洞穴。",
+      failText: "裂缝太窄了，小夜卡在半路进退两难，好不容易才退了出来。"
+    }
+  ],
+
+  // === 黑暗之魂 ===
+
+  "罗德兰 · 亚诺尔隆德": [
+    {
+      id: "anor_statue_guard", name: "银骑士的雕像",
+      desc: "走廊旁矗立着一尊银骑士雕像，手持长矛气势逼人……",
+      stat: "str", difficulty: 7,
+      successText: "小夜碰了碰雕像的盾牌，发现盾牌后面刻着一行小字。",
+      failText: "雕像太高了，小夜踮起脚尖也够不到盾牌上的纹路。",
+      accessory: { name: "银骑士徽记", stat: "str", bonus: 2, desc: "刻有银骑士纹章的金属徽章" }
+    },
+    {
+      id: "anor_stained_glass", name: "夕阳的窗口",
+      desc: "巨大的彩色玻璃窗正对着夕阳，在地面投下斑斓的色块……",
+      stat: "cha", difficulty: 5,
+      successText: "小夜站在色块中间转了个圈，觉得自己像在梦里一样。",
+      failText: "太刺眼了，小夜眯着眼看了一会儿就转身走了。"
+    },
+    {
+      id: "anor_bell_tower", name: "敲响钟声",
+      desc: "塔楼上有一口巨大的铜钟，绳索垂在一边……",
+      stat: "str", difficulty: 8,
+      successText: "小夜用尽全力拉动了绳索，钟声在整座城市上空回荡。",
+      failText: "绳索太重了，小夜被吊了起来脚离了地，只好松手摔了下来。"
+    }
+  ],
+
+  "罗德兰 · 防火女祭坛": [
+    {
+      id: "fk_dying_fire", name: "将熄的营火",
+      desc: "祭坛中央的营火快要熄灭了，只剩几缕青烟……",
+      stat: "int", difficulty: 7,
+      successText: "小夜轻轻拨动余烬添了几根细柴，火焰又重新跳动了起来。",
+      failText: "小夜吹了几口气，火不但没着烟反而呛得她直咳嗽。",
+      accessory: { name: "余烬之心", stat: "int", bonus: 2, desc: "祭坛中不灭的营火余烬" }
+    },
+    {
+      id: "fk_wildflowers", name: "祭坛上的花",
+      desc: "祭坛上放着一束新鲜的野花，像是刚有人来过……",
+      stat: "cha", difficulty: 6,
+      successText: "小夜在花束旁边放下了一颗自己捡的小石子，算是一份心意。",
+      failText: "小夜不知道该放什么，只好鞠了一躬。"
+    },
+    {
+      id: "fk_wind_whisper", name: "风中的低语",
+      desc: "一阵风吹过祭坛，带来了若有若无的低语声……",
+      stat: "int", difficulty: 8,
+      successText: "小夜侧耳倾听，低语似乎在说一个关于初火的古老故事。",
+      failText: "风声太大了，低语被吹散在了风中。"
+    }
+  ],
+
+  "无名之国 · 巨人陨落之森": [
+    {
+      id: "giant_heavy_steps", name: "迷雾中的脚步声",
+      desc: "浓雾中传来沉重的脚步声，一下一下越来越近……",
+      stat: "dex", difficulty: 7,
+      successText: "小夜闪到一棵大树后面，看着巨大的黑影缓缓走过。",
+      failText: "小夜太紧张踩断了一根枯枝，脚步声停了一下又继续远去了。",
+      accessory: { name: "巨人骨粉", stat: "str", bonus: 2, desc: "巨人陨落之森的远古骨粉" }
+    },
+    {
+      id: "giant_moss_stone", name: "长满青苔的石碑",
+      desc: "森林深处有一块长满青苔的石碑……",
+      stat: "int", difficulty: 7,
+      successText: "小夜擦掉青苔辨认出石碑上刻的是一张古地图。",
+      failText: "青苔太厚了，根本看不清下面的字。"
+    },
+    {
+      id: "giant_big_acorn", name: "巨人的橡果",
+      desc: "地上有一颗比小夜脑袋还大的橡果……",
+      stat: "str", difficulty: 6,
+      successText: "小夜把橡果抱了起来，发现里面藏着一些小种子。",
+      failText: "橡果太重了，小夜推了一下纹丝不动。"
+    }
+  ],
+
+  "罗德兰 · 绘画世界": [
+    {
+      id: "paint_footprints", name: "雪中的脚印",
+      desc: "雪地上有一串脚印延伸向远方的教堂废墟……",
+      stat: "dex", difficulty: 6,
+      successText: "小夜追着脚印找到了一棵枯树下用雪堆成的小人。",
+      failText: "脚印在风雪中很快消失了，小夜跟丢了。",
+      accessory: { name: "雪花结晶", stat: "dex", bonus: 2, desc: "绘画世界中永不融化的雪花" }
+    },
+    {
+      id: "paint_crow_messenger", name: "乌鸦的信使",
+      desc: "一只黑乌鸦停在教堂尖顶上，脚上绑着小小的卷轴……",
+      stat: "cha", difficulty: 7,
+      successText: "小夜朝乌鸦招了招手，乌鸦犹豫了一下落了下来。",
+      failText: "小夜一靠近乌鸦就飞走了。"
+    },
+    {
+      id: "paint_ice_light", name: "冰湖下的光",
+      desc: "封冻的湖面下有光芒在移动……",
+      stat: "int", difficulty: 8,
+      successText: "小夜趴在冰面上观察，发现是发光的鱼在冰下游曳。",
+      failText: "冰面太模糊了，什么都看不清。"
+    }
+  ],
+
+  "罗德兰 · 传火祭祀场": [
+    {
+      id: "firelink_glowing_ash", name: "灰烬堆",
+      desc: "角落的灰烬堆里有什么东西在微微发光……",
+      stat: "int", difficulty: 6,
+      successText: "小夜拨开灰烬发现了一块温热的圆石。",
+      failText: "灰烬太烫了，小夜被烫了一下缩回了手。",
+      accessory: { name: "初火余温", stat: "cha", bonus: 2, desc: "传火祭祀场中残存的一丝初火" }
+    },
+    {
+      id: "firelink_sword_stone", name: "插剑的仪式",
+      desc: "剑台上插着一把残破的剑……",
+      stat: "str", difficulty: 8,
+      successText: "小夜握住剑柄用尽全力拔了出来。",
+      failText: "剑纹丝不动，像是长在了石头里。"
+    },
+    {
+      id: "firelink_king_words", name: "王者的低语",
+      desc: "灰烬英雄忽然低声说了一句话……",
+      stat: "cha", difficulty: 7,
+      successText: "小夜听清了那句话——传火的人不是英雄，是不想熄灭的人。",
+      failText: "声音太沙哑了，小夜没听清。"
+    }
+  ],
+
+  // === 魔女之旅 ===
+
+  "魔女之国 · 和平国洛贝塔": [
+    {
+      id: "lobeta_falling_item", name: "天上的魔女",
+      desc: "一个骑扫帚的魔女从头顶飞过，掉下来一个小东西……",
+      stat: "dex", difficulty: 6,
+      successText: "小夜接住了掉下来的小魔力水晶。",
+      failText: "小夜没接住，东西摔在地上碎了。",
+      accessory: { name: "扫帚尾羽", stat: "dex", bonus: 2, desc: "魔女扫帚上掉落的羽毛" }
+    },
+    {
+      id: "lobeta_purple_field", name: "紫色的花田",
+      desc: "田野里的紫色花开得正盛……",
+      stat: "cha", difficulty: 5,
+      successText: "小夜躺在花田里闻着花香，感觉整个人都要融化了。",
+      failText: "小夜打了几个喷嚏——她对花粉有点敏感。"
+    },
+    {
+      id: "lobeta_warm_bread", name: "好心的大婶",
+      desc: "路边的老奶奶递过来一块刚出炉的面包……",
+      stat: "cha", difficulty: 6,
+      successText: "小夜接过面包咬了一口，又软又甜。",
+      failText: "小夜太害羞了，摇摇头跑开了。"
+    }
+  ],
+
+  "魔女之国 · 时钟乡": [
+    {
+      id: "clock_stopped_tower", name: "停摆的时钟",
+      desc: "巨大的钟楼指针停在了某个时刻……",
+      stat: "int", difficulty: 8,
+      successText: "小夜爬上钟楼看了看齿轮，发现卡了一根羽毛。取出来钟又走了。",
+      failText: "钟楼太高了，小夜爬了一半就不敢再往上爬了。",
+      accessory: { name: "齿轮零件", stat: "int", bonus: 2, desc: "时钟乡的精密齿轮残件" }
+    },
+    {
+      id: "clock_rhythm", name: "滴答声的节奏",
+      desc: "所有钟表的滴答声汇成了一个节奏……",
+      stat: "cha", difficulty: 6,
+      successText: "小夜跟着节奏哼起了歌。",
+      failText: "滴答声太多了，小夜脑子有点乱。"
+    },
+    {
+      id: "clock_spring_toy", name: "弹开的弹簧",
+      desc: "一个发条玩具突然弹开了，弹簧飞了出来……",
+      stat: "dex", difficulty: 5,
+      successText: "小夜接住弹簧装回了玩具里。",
+      failText: "弹簧滚到排水沟里去了。"
+    }
+  ],
+
+  // === 奇诺之旅 ===
+
+  "奇妙之国 · 大人之国": [
+    {
+      id: "adult_old_room", name: "废弃的手术室",
+      desc: "废弃的手术室落满了灰……",
+      stat: "int", difficulty: 8,
+      successText: "小夜发现了一本日记记录着手术前的人最后的想法。",
+      failText: "房间太暗了，什么也没看清。",
+      accessory: { name: "褪色蜡笔", stat: "cha", bonus: 3, desc: "被遗忘的孩子的蜡笔" }
+    },
+    {
+      id: "adult_child_talk", name: "最后一个孩子",
+      desc: "墙角坐着一个明天就要手术的孩子……",
+      stat: "cha", difficulty: 7,
+      successText: "小夜说长大不代表要丢掉重要的东西哦。孩子笑了。",
+      failText: "小夜不知道怎么回答。"
+    },
+    {
+      id: "adult_torn_doll", name: "被丢弃的玩具",
+      desc: "垃圾堆里有一个破旧的布偶……",
+      stat: "dex", difficulty: 5,
+      successText: "小夜捡起布偶拍了拍灰。",
+      failText: "布偶太脏了，小夜刚拿起来就打了个喷嚏。"
+    }
+  ],
+
+  "奇妙之国 · 温柔之国": [
+    {
+      id: "gentle_strange_smile", name: "不变的微笑",
+      desc: "街上的人都在微笑但笑容有点奇怪……",
+      stat: "int", difficulty: 7,
+      successText: "小夜注意到微笑的人眼睛深处没有笑意。",
+      failText: "大家都笑得很友善，可能是自己想多了。",
+      accessory: { name: "微笑面具", stat: "cha", bonus: 2, desc: "温柔之国的微笑假面" }
+    },
+    {
+      id: "gentle_crying_room", name: "没有人的房间",
+      desc: "锁着的房间里传来轻声的啜泣……",
+      stat: "str", difficulty: 6,
+      successText: "小夜推开门，一个卸下面具的人正在哭。",
+      failText: "门推不开，啜泣声也渐渐停了。"
+    },
+    {
+      id: "gentle_free_soup", name: "免费的热汤",
+      desc: "路边有一锅免费的热汤但没人敢喝……",
+      stat: "cha", difficulty: 6,
+      successText: "小夜盛了一碗尝了尝很好喝。",
+      failText: "小夜犹豫了一下还是没敢喝。"
+    }
+  ],
+
+  // === 小夜的秘密 ===
+
+  "休憩之所 · 森林分所": [
+    {
+      id: "branch_unsent_note", name: "书桌上的便签",
+      desc: "书桌上有一张没写完的便签……",
+      stat: "int", difficulty: 5,
+      successText: "小夜拿起笔补了一句话：今天也是好天气。",
+      failText: "看了半天不知道写什么，又放下了笔。",
+      accessory: { name: "树洞钥匙", stat: "int", bonus: 2, desc: "森林分所的旧钥匙" }
+    },
+    {
+      id: "branch_cold_tea", name: "凉掉的茶",
+      desc: "茶已经凉了，茶壶下压着一张字条……",
+      stat: "cha", difficulty: 5,
+      successText: "字条上写着给小夜，小夜心里暖暖的。",
+      failText: "字条被茶渍浸湿了看不清。"
+    },
+    {
+      id: "branch_bird_visitor", name: "窗外的风景",
+      desc: "窗外的小鸟停在窗台上歪着头看小夜……",
+      stat: "dex", difficulty: 6,
+      successText: "小夜轻轻推开窗，小鸟跳到了窗沿上。",
+      failText: "开窗动静太大，小鸟飞走了。"
+    }
+  ],
+
+  // === 环世界 ===
+
+  "环世界 · 冻原": [
+    {
+      id: "tundra_coming_storm", name: "暴风雪来了",
+      desc: "远处的天际线模糊了暴风雪正在逼近……",
+      stat: "int", difficulty: 7,
+      successText: "小夜在雪地里找到了避风的岩缝。",
+      failText: "风太大了被雪吹得睁不开眼。",
+      accessory: { name: "极地护符", stat: "str", bonus: 2, desc: "抵御严寒的护符" }
+    },
+    {
+      id: "tundra_round_seal", name: "冰上的海豹",
+      desc: "圆滚滚的海豹躺在冰面上晒太阳……",
+      stat: "cha", difficulty: 6,
+      successText: "小夜蹲下来海豹朝她滚了过来蹭了蹭。",
+      failText: "走太近了海豹扑通跳进了水里。"
+    },
+    {
+      id: "tundra_blue_cave", name: "冰洞探秘",
+      desc: "冰崖下有一个幽蓝的冰洞入口……",
+      stat: "dex", difficulty: 7,
+      successText: "小夜小心翼翼走进冰洞看到了绝美的蓝色冰晶。",
+      failText: "洞口太滑了差点摔倒。"
+    }
+  ],
+
+  // === 深海 ===
+
+  "深海 · 沉没之城": [
+    {
+      id: "sunken_bubble_trail", name: "气泡的轨迹",
+      desc: "气泡从海底升起沿着古老建筑的墙壁向上飘……",
+      stat: "int", difficulty: 7,
+      successText: "小夜跟着气泡来到了被海藻覆盖的雕像前。",
+      failText: "气泡很快就散了，跟丢了方向。",
+      accessory: { name: "深海的歌", stat: "cha", bonus: 3, desc: "封印着深海旋律的海螺" }
+    },
+    {
+      id: "sunken_glowing_fish", name: "发光的鱼群",
+      desc: "发光的鱼围着小夜转了一圈然后朝某个方向游去……",
+      stat: "dex", difficulty: 6,
+      successText: "小夜跟着鱼群发现了一座被珊瑚覆盖的古老神殿。",
+      failText: "鱼群游太快了追不上。"
+    },
+    {
+      id: "sunken_rusty_chest", name: "沉没的宝箱",
+      desc: "半埋在砂砾里的宝箱锁已经锈蚀了……",
+      stat: "str", difficulty: 7,
+      successText: "小夜掀开箱盖里面是一颗柔和蓝光的珍珠。",
+      failText: "宝箱卡在珊瑚里了怎么拉都拉不动。"
+    }
+  ],
+
+  // === 少女终末旅行 ===
+
+  "终末世界 · 雪原浴池": [
+    {
+      id: "bath_steam_warmth", name: "浴池的热气",
+      desc: "雪地里的浴池冒着腾腾的热气……",
+      stat: "str", difficulty: 6,
+      successText: "小夜把脚伸进水里试了试温度温热的超舒服。",
+      failText: "水太烫了脚尖被烫了一下缩了回来。",
+      accessory: { name: "雪原暖玉", stat: "str", bonus: 2, desc: "雪原浴池中沉底的暖石" }
+    },
+    {
+      id: "bath_dry_towel", name: "晾着的毛巾",
+      desc: "浴池边晾着一条干毛巾被风吹得摆动……",
+      stat: "cha", difficulty: 5,
+      successText: "小夜用毛巾擦了擦脸有阳光晒过的味道。",
+      failText: "毛巾被风吹走了追了好远才捡回来。"
+    },
+    {
+      id: "bath_snow_water", name: "雪和热水",
+      desc: "小夜捧了一把雪丢进温泉里看着它融化……",
+      stat: "int", difficulty: 5,
+      successText: "雪融化的时候小夜想到冷和热其实可以共存。",
+      failText: "玩雪玩太开心了手冻得通红。"
+    }
+  ],
+
+  "终末世界 · 街灯都市": [
+    {
+      id: "lamp_flickering", name: "闪烁的街灯",
+      desc: "一盏老旧的街灯忽明忽暗发出滋滋的电流声……",
+      stat: "int", difficulty: 7,
+      successText: "小夜轻轻敲了敲灯柱灯突然稳定亮了起来。",
+      failText: "拍了灯柱一下灯直接灭了周围陷入黑暗。",
+      accessory: { name: "旧灯泡", stat: "int", bonus: 2, desc: "街灯都市里拆下的旧灯泡" }
+    },
+    {
+      id: "lamp_old_diary", name: "地上的日记",
+      desc: "地上有一本落满灰的日记风翻动着纸页……",
+      stat: "cha", difficulty: 6,
+      successText: "小夜捡起日记读到了某人最后的文字。",
+      failText: "纸页太脆了一碰就碎了。"
+    },
+    {
+      id: "lamp_twisting_alleys", name: "迷宫般的小巷",
+      desc: "都市的小巷像迷宫一样交错……",
+      stat: "dex", difficulty: 7,
+      successText: "小夜用粉笔画标记顺利穿过了巷道。",
+      failText: "转了好几圈都找不到出口只好原路返回。"
+    }
+  ],
+
+  "终末世界 · 飞行塔": [
+    {
+      id: "flight_unfinished", name: "未完成的飞机",
+      desc: "塔里的飞机骨架还差机翼没装好零件散了一地……",
+      stat: "int", difficulty: 8,
+      successText: "小夜研究了图纸成功把机翼装了上去。",
+      failText: "零件太多了完全看不懂图纸。",
+      accessory: { name: "飞行图纸", stat: "int", bonus: 2, desc: "未完成的飞机设计图" }
+    },
+    {
+      id: "flight_dried_fish", name: "屋顶的风干鱼",
+      desc: "塔顶晾着几条风干的鱼在风中像旗帜一样摇晃……",
+      stat: "str", difficulty: 5,
+      successText: "小夜踮脚取下了一条鱼干闻了闻还挺香的。",
+      failText: "鱼干挂太高了够不到。"
+    },
+    {
+      id: "flight_top_wind", name: "塔顶的风",
+      desc: "站在塔顶风吹得头发和尾巴都在飘扬……",
+      stat: "cha", difficulty: 5,
+      successText: "小夜张开双臂感觉自己像鸟一样自由。",
+      failText: "风太大被吹得站不稳只好蹲下来。"
+    }
+  ],
+
+  "终末世界 · 螺旋阶梯": [
+    {
+      id: "spiral_endless_steps", name: "数不完的台阶",
+      desc: "螺旋阶梯一圈又一圈仿佛永远没有尽头……",
+      stat: "str", difficulty: 7,
+      successText: "小夜一边爬一边数数到一千二百三十四级到了顶。",
+      failText: "爬了没多久就累了坐在台阶上喘了好一会儿。",
+      accessory: { name: "螺旋石屑", stat: "str", bonus: 2, desc: "螺旋阶梯上剥落的古老石屑" }
+    },
+    {
+      id: "spiral_step_echo", name: "阶梯的回声",
+      desc: "每一层台阶的回音都不一样有的清脆有的沉闷……",
+      stat: "int", difficulty: 6,
+      successText: "小夜发现沉闷的回音下有空洞——有一块松动的砖。",
+      failText: "回音乱七八糟的什么都分辨不出来。"
+    },
+    {
+      id: "spiral_mid_rest", name: "中途的平台",
+      desc: "阶梯中间有一个小平台放着一张破旧沙发……",
+      stat: "cha", difficulty: 5,
+      successText: "小夜坐下来休息想象是谁把沙发搬来这里的。",
+      failText: "沙发太破了刚坐下去弹簧就弹了出来。"
+    }
+  ],
+
+  "终末世界 · 顶层雪原": [
+    {
+      id: "top_deep_silence", name: "绝对的寂静",
+      desc: "顶层只有一望无际的雪和风声安静得能听到心跳……",
+      stat: "cha", difficulty: 7,
+      successText: "小夜在雪地里坐下来感受到了前所未有的平静。",
+      failText: "太安静了小夜有点害怕只想快点离开。",
+      accessory: { name: "静寂之证", stat: "cha", bonus: 2, desc: "绝对寂静凝结的信物" }
+    },
+    {
+      id: "top_sunrise_glow", name: "雪原的日出",
+      desc: "地平线上泛起橘红色的光芒日出要来了……",
+      stat: "dex", difficulty: 6,
+      successText: "小夜跑到最高处看到了太阳升起照亮雪原的全过程。",
+      failText: "云太多了日出被遮住了只透出一点光。"
+    },
+    {
+      id: "top_snow_message_heart", name: "雪中的留言",
+      desc: "雪地里有人用小石头摆了一个心形旁边写着到此一游……",
+      stat: "int", difficulty: 5,
+      successText: "小夜在留言旁边加了一行小字：我也是。",
+      failText: "不知道写什么只好放了一块石头在旁边。"
+    }
+  ],
+
+  // === 人类衰退之后 ===
+
+  "妖精之国 · 楠木村": [
+    {
+      id: "nanaki_missing_cookie", name: "消失的曲奇",
+      desc: "刚烤好的曲奇放在窗台上晾凉一转眼少了一块……",
+      stat: "dex", difficulty: 6,
+      successText: "小夜看到小个子妖精抱着曲奇正要逃跑忍不住笑了。",
+      failText: "一眨眼曲奇就不见了只剩一点碎屑。",
+      accessory: { name: "妖精曲奇", stat: "cha", bonus: 2, desc: "楠木村特制的手工曲奇" }
+    },
+    {
+      id: "nanaki_warm_tea", name: "凉掉的红茶",
+      desc: "桌上的红茶杯还有余温但喝茶的人已经不在了……",
+      stat: "int", difficulty: 6,
+      successText: "小夜抿了一口茶里有淡淡的蜂蜜香。",
+      failText: "茶完全凉了喝起来有点涩。"
+    },
+    {
+      id: "nanaki_fairy_house", name: "树上的小屋",
+      desc: "树枝上有一个巴掌大的小房子门口晾着更小的衣服……",
+      stat: "str", difficulty: 7,
+      successText: "小夜爬上树在小房子门口放了一颗糖。",
+      failText: "树枝太细了承受不住重量。"
+    }
+  ],
+
+  "妖精之国 · 秘密工厂": [
+    {
+      id: "factory_old_machine", name: "运转的机器",
+      desc: "老旧的机器还在嗡嗡运转传送带上有未完成的零件……",
+      stat: "int", difficulty: 7,
+      successText: "小夜研究了控制面板居然搞懂了操作做出了完美零件。",
+      failText: "按钮太多乱按一通机器发出奇怪响声。",
+      accessory: { name: "小零件", stat: "dex", bonus: 2, desc: "妖精制作的精密零件" }
+    },
+    {
+      id: "factory_sparks", name: "闪烁的灯光",
+      desc: "灯的忽明忽暗电火花从破口溅落……",
+      stat: "dex", difficulty: 6,
+      successText: "小夜躲过火花找到了总闸开关。",
+      failText: "被火花吓到差点绊到管子。"
+    },
+    {
+      id: "factory_busy_fairy", name: "忙碌的小妖精",
+      desc: "小妖精抱着比自己还大的螺丝刀吃力地拧螺丝……",
+      stat: "str", difficulty: 5,
+      successText: "小夜帮小妖精扶住了螺丝它感激地挥了挥手。",
+      failText: "想帮忙但手太大了反而把东西碰倒了。"
+    }
+  ],
+
+  "妖精之国 · 砂糖森林": [
+    {
+      id: "sugar_honey_stream", name: "蜂蜜小溪",
+      desc: "一条金色小溪在森林里流淌散发出甜香……",
+      stat: "int", difficulty: 6,
+      successText: "小夜沾了一点尝了尝真的是蜂蜜。",
+      failText: "趴下去喝了一大口甜到齁嗓子。",
+      accessory: { name: "棒棒糖花", stat: "str", bonus: 2, desc: "砂糖森林长出的棒棒糖花" }
+    },
+    {
+      id: "sugar_cotton_cloud", name: "棉花糖云",
+      desc: "低空飘着一朵粉色的云看起来软软的……",
+      stat: "dex", difficulty: 6,
+      successText: "小夜跳起来扯下一小块真的是棉花糖。",
+      failText: "云飘太高了好几次都没够到。"
+    },
+    {
+      id: "sugar_lost_recipe", name: "遗失的食谱",
+      desc: "树洞里藏着一本手写食谱纸页快被糖渍粘住了……",
+      stat: "cha", difficulty: 7,
+      successText: "小夜小心翻开食谱里面记满了神奇甜点的做法。",
+      failText: "纸页黏太紧了翻的时候撕破了。"
+    }
+  ],
+
+  // === 指环王 ===
+
+  "中土 · 夏尔郡": [
+    {
+      id: "shire_party_tree", name: "宴会树的邀请",
+      desc: "宴会树下摆着长长的餐桌食物还冒着热气……",
+      stat: "cha", difficulty: 6,
+      successText: "小夜享用了霍比特人的大餐后躺在草地上休息。",
+      failText: "食物太多不知道从哪道开始吃。",
+      accessory: { name: "宴会花瓣", stat: "cha", bonus: 2, desc: "宴会树上落下的花瓣" }
+    },
+    {
+      id: "shire_bilbos_garden", name: "袋底洞的花园",
+      desc: "花园里开满五颜六色的花园门虚掩着……",
+      stat: "str", difficulty: 6,
+      successText: "小夜推开门在花丛中发现了一把小旧铲子。",
+      failText: "园门看起来是关着的没敢推。"
+    },
+    {
+      id: "shire_hobbit_song", name: "远处的歌声",
+      desc: "远处传来霍比特人的歌声他们在庆祝什么……",
+      stat: "dex", difficulty: 5,
+      successText: "小夜循声跑去看到霍比特人在跳舞也跟着跳了两下。",
+      failText: "歌声随风飘远了跑到的时候已经散了。"
+    }
+  ],
+
+  "中土 · 瑞文戴尔": [
+    {
+      id: "rivendell_elven_tongue", name: "精灵的低语",
+      desc: "瀑布边传来精灵的低语声是古老优美的语言……",
+      stat: "int", difficulty: 8,
+      successText: "小夜静静听着虽然听不懂但心里特别安宁。",
+      failText: "瀑布声太大盖过了精灵的声音。",
+      accessory: { name: "精灵叶", stat: "int", bonus: 2, desc: "瑞文戴尔的精灵树叶闪着银光" }
+    },
+    {
+      id: "rivendell_stone_bridge", name: "古老的石桥",
+      desc: "跨越溪流的石桥长满青苔桥下清澈见底……",
+      stat: "cha", difficulty: 6,
+      successText: "小夜站在桥上看倒影自己融入了美景中。",
+      failText: "在桥上蹦了一下青苔很滑差点滑倒。"
+    },
+    {
+      id: "rivendell_elrond_table", name: "空着的会议厅",
+      desc: "爱隆的会议厅空无一人但地图和文件还在……",
+      stat: "str", difficulty: 7,
+      successText: "小夜看了看地图上面标注着通往魔多的旅程。",
+      failText: "看不懂精灵的地图坐标符号太复杂了。"
+    }
+  ]
+};
+
+// ========== 目的地访问追踪 ==========
+let destinationTracker = JSON.parse(localStorage.getItem("yeDestTracker") || "{}");
+// 格式: { "圣巢 · 王后花园": { visits: 0, nextItemIdx: 0 } }
+// visits=已访问次数, nextItemIdx=下次给第几个特产
+
+// ========== 迷雾模式数据 ==========
+let fogData = JSON.parse(localStorage.getItem("yeFogData") || "null") || {
+  unlocked: false,
+  completed: false,
+  bestStages: 0,
+  memoryRestored: 0
+};
+
+// 当前迷雾运行状态（不持久化，每次挑战重置）
+let fogRun = null;
+
+function getAvailableDests() {
+  return destinations.filter(d => {
+    const t = destinationTracker[d.name];
+    return !t || t.nextItemIdx < d.items.length;
+  });
+}
+
+function canVisitAgain(dest) {
+  const t = destinationTracker[dest.name];
+  return !t || t.nextItemIdx < dest.items.length;
+}
+
+// ========== 检查迷雾解锁 ==========
+function isAllCollected() {
+  return destinations.every(d => {
+    const t = destinationTracker[d.name];
+    return t && t.nextItemIdx >= d.items.length;
+  });
+}
+
+// ========== 迷雾事件池 ==========
+const fogEvents = {
+  easy: [
+    {
+      id: "fog_whisper", name: "遗忘的低语",
+      desc: "灰白色的雾中传来细碎的低语声，它们在说——\"放弃吧，那些记忆不重要……\"",
+      stat: "str", difficulty: 8,
+      successText: "小夜捂住耳朵，大声喊出最重要的名字！低语被驱散了，雾好像淡了一点点。",
+      failText: "低语渐渐变大，小夜感觉头好晕，差点就信了……还好只是咬紧牙关撑过去了。"
+    },
+    {
+      id: "fog_footsteps", name: "渐远的脚步声",
+      desc: "雾中有一个模糊的身影正在远去，那是……谁？小夜莫名觉得不能让它消失。",
+      stat: "dex", difficulty: 9,
+      successText: "小夜追了上去！虽然没追到，但看到那个身影回头笑了一下——好熟悉的感觉……",
+      failText: "雾太浓了，小夜跑了几步就找不到方向了，那个身影就这么消失在雾里。"
+    },
+    {
+      id: "fog_echo", name: "记忆的回声",
+      desc: "雾中传来一阵温柔的声音，好像有人在叫小夜的名字……但听不清是谁。",
+      stat: "cha", difficulty: 8,
+      successText: "小夜轻声回应：\"我在这里\"，声音清晰了起来——那个声音好熟悉！小夜记住了这个声音。",
+      failText: "小夜拼命想回应，但声音越来越远，最后什么都听不到了……"
+    },
+    {
+      id: "fog_shard", name: "迷雾碎影",
+      desc: "雾中飘着一片发光的碎片，里面好像有一段画面，但太模糊了看不清。",
+      stat: "int", difficulty: 8,
+      successText: "小夜集中精神凝视碎片——那是看过的美丽风景！碎片化作光点融入了小夜的心里。",
+      failText: "碎片闪烁了几下就熄灭了，画面完全没看清……"
+    }
+  ],
+  medium: [
+    {
+      id: "fog_postcard", name: "破碎的明信片",
+      desc: "一张褪色的明信片飘在雾中，上面的字迹正在消失……小夜必须在它完全消失前记住。",
+      stat: "int", difficulty: 11,
+      successText: "小夜拼命回想——这是去过的某个地方！明信片上的画面在小夜的记忆中重新清晰起来。💫",
+      failText: "字迹消散得太快了，小夜只来得及抓住一个模糊的轮廓……"
+    },
+    {
+      id: "fog_mirror", name: "镜中倒影",
+      desc: "雾气凝成一面镜子，镜中的小夜越来越模糊，像一个正在被擦去的画像。",
+      stat: "cha", difficulty: 12,
+      successText: "小夜对着镜子微笑：\"我知道我是谁——我是小夜。\"镜中的小夜也笑了，清晰了起来。",
+      failText: "小夜盯着镜子，有一瞬间想不起来自己的样子……"
+    },
+    {
+      id: "fog_corridor", name: "雾之回廊",
+      desc: "雾中出现一条扭曲的回廊，两侧的墙上飞快地闪过熟悉的画面——都是去过的世界的影子。",
+      stat: "dex", difficulty: 12,
+      successText: "小夜在回廊中穿梭追逐那些画面！每抓住一个，那个世界的记忆就更清晰了一分。",
+      failText: "回廊七拐八绕的，小夜追着追着就迷了路，好多画面都溜走了……"
+    }
+  ],
+  hard: [
+    {
+      id: "fog_void", name: "虚空裂隙",
+      desc: "灰雾猛然撕裂开一道漆黑的裂隙，记忆碎片正在被吸进去！小夜感到一阵窒息般的恐慌。",
+      stat: "int", difficulty: 14,
+      successText: "小夜闭上眼，深呼吸——\"我最珍贵的记忆是……有人说过'正因为是小夜才行'。\"裂隙慢慢愈合了！",
+      failText: "裂隙吸走了太多碎片，小夜感觉脑袋里空了一块……"
+    },
+    {
+      id: "fog_hand", name: "遗忘之手",
+      desc: "雾气凝成一只巨大的灰色手掌，朝小夜伸来——它要夺走小夜心底最宝贵的东西。",
+      stat: "str", difficulty: 14,
+      successText: "小夜用尽全身力气推开那只手！\"谁都不能抢走小夜最重要的回忆！\"手掌碎裂成雾散开了。",
+      failText: "手掌太沉重了，小夜被压得喘不过气……有一瞬间，小夜差点忘了自己为什么在战斗。"
+    },
+    {
+      id: "fog_abyss", name: "记忆深渊",
+      desc: "脚下的地面消失了，小夜坠入一片无尽的灰白。周围飘满了陌生的画面——哪一些才是真的？",
+      stat: "cha", difficulty: 14,
+      successText: "在坠落中，小夜听到了心跳声——那是活着的心跳。\"我记得你。\"深渊碎裂了。",
+      failText: "小夜分不清哪些记忆是真的了……在这个灰白的世界里，小夜迷失了方向。"
+    }
+  ],
+  boss: {
+    id: "fog_boss", name: "遗忘之主的投影",
+    desc: "灰雾骤然凝聚成一个巨大的黑影，它没有面孔，但小夜能感觉到它在——\"笑\"。\n\"你守不住的。所有的记忆，终将归于遗忘。\"",
+    stat: null,  // 玩家自选
+    difficulty: 16,
+    successText: "小夜拼尽全力对抗黑影，在最后一刻听到了——那些被守护的记忆化作万千光点，击穿了黑影！\n\"不……我永远不会忘记。\"遗忘之主的投影消散了，阳光照了进来。☀️",
+    failText: "黑影笼罩了一切，小夜被迷雾吞没，耳边只剩下那句话——\"你守不住的……\"\n但即使如此，小夜也不会放弃。"
+  }
+};
+
+// ========== 迷雾运行数据 ==========
+function initFogRun() {
+  const selected = [
+    ...fogEvents.easy.map(e => ({ ...e, tier: 'easy' })),
+    ...fogEvents.medium.map(e => ({ ...e, tier: 'medium' })),
+    ...fogEvents.hard.map(e => ({ ...e, tier: 'hard' }))
+  ];
+  // Fisher-Yates 洗牌
+  for (let i = selected.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [selected[i], selected[j]] = [selected[j], selected[i]];
+  }
+  fogRun = {
+    stages: selected,
+    currentStage: 0,
+    passedStages: 0,
+    bossAvailable: false,
+    active: true
+  };
+}
+
+function getFogDifficultyLabel(tier) {
+  if (tier === 'easy') return '🌱';
+  if (tier === 'medium') return '🔥';
+  return '💀';
+}
+
+function saveFogData() {
+  localStorage.setItem("yeFogData", JSON.stringify(fogData));
+}
+
+// ========== 核心逻辑 ==========
+
+function sendYe() {
+  if (state !== STATE.IDLE) return;
+  
+  // 迷雾模式已解锁且未通关
+  if (fogData.unlocked && !fogData.completed) {
+    // Boss战模式
+    if (fogRun?.bossAvailable) {
+      state = STATE.FOG;
+      totalTime = (15 + Math.floor(Math.random() * 6)) * 60; // 15-20分钟
+      timeRemaining = totalTime;
+      travelStartTime = Date.now();
+      updateUI();
+      document.getElementById("hintText").textContent = "👑 小夜走向雾中最深处……遗忘之主就在前方。";
+      travelTimer = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - travelStartTime) / 1000);
+        timeRemaining = Math.max(0, totalTime - elapsed);
+        updateUI();
+        if (timeRemaining <= 0) {
+          clearInterval(travelTimer);
+          fogBossFight();
+        }
+      }, 500);
+      return;
+    }
+    
+    // 普通迷雾挑战
+    initFogRun();
+    state = STATE.FOG;
+    totalTime = (12 + Math.floor(Math.random() * 9)) * 60;
+    timeRemaining = totalTime;
+    travelStartTime = Date.now();
+    updateUI();
+    document.getElementById("hintText").textContent = "🌫️ 小夜走进了迷雾……";
+    travelTimer = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - travelStartTime) / 1000);
+      timeRemaining = Math.max(0, totalTime - elapsed);
+      updateUI();
+      if (timeRemaining <= 0) {
+        clearInterval(travelTimer);
+        fogArrive();
+      }
+    }, 500);
+    return;
+  }
+  
+  // 自由旅行（通关后）
+  if (fogData.completed) {
+    const allDests = [...destinations];
+    currentDest = allDests[Math.floor(Math.random() * allDests.length)];
+    state = STATE.TRAINING;
+    totalTime = (12 + Math.floor(Math.random() * 9)) * 60;
+    timeRemaining = totalTime;
+    travelStartTime = Date.now();
+    updateUI();
+    document.getElementById("hintText").textContent = `小夜再次踏上了前往${currentDest.name}的旅途～`;
+    travelTimer = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - travelStartTime) / 1000);
+      timeRemaining = Math.max(0, totalTime - elapsed);
+      updateUI();
+      if (timeRemaining <= 0) {
+        clearInterval(travelTimer);
+        freeTravelArrive();
+      }
+    }, 500);
+    return;
+  }
+  
+  // 普通旅行
+  const available = getAvailableDests();
+  if (available.length === 0) {
+    // 全部集齐！解锁迷雾模式
+    fogData.unlocked = true;
+    saveFogData();
+    updateUI();
+    document.getElementById("hintText").textContent = "🌫️ 小夜感觉有些记忆开始模糊了……迷雾之中，有什么在等待。";
+    return;
+  }
+  
+  currentDest = available[Math.floor(Math.random() * available.length)];
+  totalTime = (12 + Math.floor(Math.random() * 9)) * 60;
+  timeRemaining = totalTime;
+  travelStartTime = Date.now();
+  state = STATE.TRAVELING;
+  updateUI();
+  document.getElementById("hintText").textContent = `小夜正在前往 ${currentDest.name} 的路上...`;
+  travelTimer = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - travelStartTime) / 1000);
+    timeRemaining = Math.max(0, totalTime - elapsed);
+    updateUI();
+    if (timeRemaining <= 0) {
+      clearInterval(travelTimer);
+      arriveHome();
+    }
+  }, 500);
+}
+
+function arriveHome() {
+  state = STATE.IDLE;
+  
+  // 更新访问追踪
+  if (!destinationTracker[currentDest.name]) {
+    destinationTracker[currentDest.name] = { visits: 0, nextItemIdx: 0 };
+  }
+  const tracker = destinationTracker[currentDest.name];
+  const isRevisit = tracker.visits > 0;
+  tracker.visits++;
+  
+  // 生成明信片
+  const moodIdx = Math.floor(Math.random() * moods.length);
+  
+  // 旅途故事（按访问次数选不同版本）
+  const travelStory = generateTravelStory(currentDest, isRevisit, tracker.visits);
+  
+  // 按顺序拿特产
+  const itemIdx = tracker.nextItemIdx;
+  if (itemIdx < currentDest.items.length) {
+    tracker.nextItemIdx++;
+  }
+  
+  const postcard = {
+    id: Date.now(),
+    dest: currentDest.name,
+    world: currentDest.world,
+    desc: currentDest.desc,
+    img: currentDest.img || null,
+    mood: moods[moodIdx],
+    moodEmoji: moodEmojis[moodIdx],
+    story: travelStory,
+    time: new Date().toLocaleString(),
+    isRevisit: isRevisit,
+    visitCount: tracker.visits
+  };
+  postcardCollection.unshift(postcard);
+  if (postcardCollection.length > 30) postcardCollection.pop();
+  
+  // 生成特产
+  const souvenirName = itemIdx < currentDest.items.length ? currentDest.items[itemIdx] : currentDest.items[currentDest.items.length - 1];
+  const souvenir = {
+    id: Date.now() + 1,
+    name: souvenirName,
+    from: currentDest.name,
+    world: currentDest.world
+  };
+  souvenirCollection.unshift(souvenir);
+  if (souvenirCollection.length > 40) souvenirCollection.pop();
+  
+  // 旅途日志
+  journeyLog.unshift({
+    id: Date.now() + 2,
+    dest: currentDest.name,
+    world: currentDest.world,
+    time: new Date().toLocaleString(),
+    count: tracker.visits
+  });
+  if (journeyLog.length > 50) journeyLog.pop();
+  
+  // 全部特产拿完了？发个提示
+  let hintText = "小夜回来了！带来了新的明信片和特产～🫶";
+  if (!canVisitAgain(currentDest)) {
+    hintText = `${currentDest.name}的所有特产都收集齐了吱～小夜暂时不会再去那里了🫶`;
+  }
+  
+  // ========== 事件系统：触发2~3个随机事件 ==========
+  const pool = eventPools[currentDest.name];
+  const eventResults = [];
+  let totalExpGained = 0;
+  let newAccessories = [];
+  
+  if (pool && pool.length > 0) {
+    const numEvents = 2 + Math.floor(Math.random() * 2); // 2~3件
+    const shuffled = [...pool];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    const selected = shuffled.slice(0, Math.min(numEvents, pool.length));
+    
+    for (const evt of selected) {
+      const statVal = getStatValue(evt.stat);
+      const dice = rollD6();
+      const worldBonus = worldDifficulty[currentDest.world] || 0;
+      const effectiveDifficulty = evt.difficulty + worldBonus + 2;
+      const success = (statVal + dice) >= effectiveDifficulty;
+      const expGain = success ? 20 : 5;
+      totalExpGained += expGain;
+      addStatExp(evt.stat, expGain);
+      
+      let gotAccessory = null;
+      if (success && evt.accessory) {
+        const alreadyHas = yeStats.backpack.some(a => a.name === evt.accessory.name);
+        if (!alreadyHas && Math.random() < 0.3) {
+          gotAccessory = { ...evt.accessory };
+          yeStats.backpack.push(gotAccessory);
+          newAccessories.push(gotAccessory.name);
+        }
+      }
+      
+      eventResults.push({
+        name: evt.name,
+        desc: evt.desc,
+        stat: evt.stat,
+        statVal: statVal,
+        dice: dice,
+        difficulty: evt.difficulty,
+        effectiveDifficulty: effectiveDifficulty,
+        difficultyLabel: getDifficultyLabel(effectiveDifficulty),
+        success: success,
+        expGain: expGain,
+        resultText: success ? evt.successText : evt.failText,
+        gotAccessory: gotAccessory
+      });
+    }
+    saveYeStats();
+  }
+  
+  // 将事件结果加入明信片
+  postcard.events = eventResults;
+  postcard.expGained = totalExpGained;
+  postcard.newAccessories = newAccessories;
+  
+  if (eventResults.length > 0) {
+    hintText = `小夜回来了！发生了${eventResults.length}件事，获得了${totalExpGained}点属性经验～🫶`;
+    if (newAccessories.length > 0) {
+      hintText = `小夜回来了！获得了新饰品【${newAccessories.join('、')}】🎉`;
+    }
+  }
+  
+  // 保存
+  localStorage.setItem("yeJourneyLog", JSON.stringify(journeyLog));
+  localStorage.setItem("yePostcards", JSON.stringify(postcardCollection));
+  localStorage.setItem("yeSouvenirs", JSON.stringify(souvenirCollection));
+  localStorage.setItem("yeDestTracker", JSON.stringify(destinationTracker));
+  
+  // 显示结果
+  lastTravelStory = travelStory;
+  lastDestName = currentDest.name;
+  document.getElementById("hintText").textContent = hintText;
+  updateUI();
+  renderJourneyLog();
+  
+  // 自动切到明信片tab
+  switchTab('postcards');
+}
+
+// ========== 迷雾阶段结算 ==========
+
+function fogArrive() {
+  if (!fogRun || !fogRun.active) {
+    state = STATE.IDLE;
+    updateUI();
+    return;
+  }
+  
+  const stage = fogRun.stages[fogRun.currentStage];
+  if (!stage) {
+    // 10个阶段全部完成
+    const actualPassed = fogRun.passedStages;
+    fogRun.bossAvailable = actualPassed >= 10;
+    fogRun.currentStage = 10;
+    fogRun.active = false;
+    
+    // 结算记忆恢复（按实际通过阶段数）
+    const memoryPct = actualPassed * 10;
+    fogData.memoryRestored = Math.max(fogData.memoryRestored, memoryPct);
+    fogData.bestStages = Math.max(fogData.bestStages, actualPassed);
+    saveFogData();
+    
+    state = STATE.IDLE;
+    updateUI();
+    document.getElementById("hintText").textContent =
+      `🌫️ 10个阶段全部结束！\n` +
+      `通过了 ${actualPassed} 个阶段，恢复了 ${memoryPct}% 的记忆！\n\n` +
+      (actualPassed >= 10
+        ? `雾中隐约出现了一个庞大的黑影……\n遗忘之主的投影就在前方。\n\n准备好了就去面对它吧！`
+        : `\"我不会放弃的……再试一次吧。\"`);
+    switchTab('stats');
+    return;
+  }
+  
+  // 当前阶段检定
+  const statVal = getStatValue(stage.stat);
+  const dice = rollD6();
+  const success = (statVal + dice) >= stage.difficulty;
+  
+  if (success) {
+    fogRun.passedStages++;
+    // 对应属性加经验（迷雾事件给双倍经验）
+    addStatExp(stage.stat, 40);
+  } else {
+    addStatExp(stage.stat, 10);
+  }
+  
+  // 记录阶段结果
+  stage.result = {
+    statVal,
+    dice,
+    success,
+    total: statVal + dice
+  };
+  
+  fogRun.currentStage++;
+  
+  // 继续下一阶段
+  state = STATE.IDLE;
+  updateUI();
+  
+  const tierLabel = getFogDifficultyLabel(stage.tier);
+  const resultText = success ? '成功✅' : '失败❌';
+  const memoryPct = Math.min(100, fogRun.passedStages * 10);
+  
+  document.getElementById("hintText").textContent =
+    `🌫️ 阶段 ${fogRun.currentStage}/10 ${tierLabel}\n` +
+    `${STAT_NAMES[stage.stat]}检定（难度${stage.difficulty}）：属性${statVal} + 骰子${dice} = ${statVal + dice}，${resultText}\n` +
+    `${stage.resultText}\n` +
+    `\n已恢复记忆：${memoryPct}% | 通过：${fogRun.passedStages}/${fogRun.currentStage}`;
+  
+  switchTab('stats');
+}
+
+// ========== 遗忘之主战斗 ==========
+
+function fogBossFight() {
+  const boss = fogEvents.boss;
+  
+  // 选择最高属性来面对遗忘之主
+  const stats = ['str', 'dex', 'int', 'cha'];
+  let bestStat = 'str';
+  let bestVal = 0;
+  for (const s of stats) {
+    const val = getStatValue(s);
+    if (val > bestVal) {
+      bestVal = val;
+      bestStat = s;
+    }
+  }
+  // getStatValue已包含装备加成
+  let totalVal = bestVal;
+  
+  const dice = rollD6();
+  const success = (totalVal + dice) >= boss.difficulty;
+  
+  state = STATE.IDLE;
+  updateUI();
+  
+  if (success) {
+    // 战胜遗忘之主！
+    fogData.completed = true;
+    fogData.memoryRestored = 100;
+    fogData.bestStages = 10;
+    saveFogData();
+    
+    // 给一大波经验
+    addStatExp(bestStat, 200);
+    saveYeStats();
+    
+    // 给最终明信片
+    const finalPostcard = {
+      id: Date.now(),
+      dest: "✦ 记忆的尽头 ✦",
+      world: "小夜的心",
+      desc: "最终，小夜站在了阳光之中。\n\n遗忘之主的投影消散了，所有的记忆——那些走过的风景、笑过的瞬间、守护的宝物——全部回来了。\n\n小夜明白了：记忆之所以珍贵，不是因为它们永远不会消失，而是因为有人愿意为守护它们而战斗。",
+      img: "memory_end",
+      mood: "感动",
+      moodEmoji: "🥹",
+      story: ["小夜战胜了遗忘。不是因为力量有多强，而是因为——有些回忆，比恐惧更强。"],
+      time: new Date().toLocaleString(),
+      isRevisit: false,
+      visitCount: 1,
+      events: [],
+      expGained: 200
+    };
+    postcardCollection.unshift(finalPostcard);
+    localStorage.setItem("yePostcards", JSON.stringify(postcardCollection));
+    
+    document.getElementById("hintText").textContent =
+      `🌟 小夜战胜了遗忘之主的投影！\n\n${STAT_NAMES[bestStat]}检定（难度${boss.difficulty}）：属性${totalVal} + 骰子${dice} = ${totalVal + dice}，成功✅\n\n${boss.successText}\n\n☀️ 所有的记忆都回来了！小夜获得了终局明信片：【✦ 记忆的尽头 ✦】`;
+    switchTab('postcards');
+  } else {
+    // 失败
+    addStatExp(bestStat, 20);
+    saveYeStats();
+    
+    // 保留已恢复的记忆，但boss战后可以继续挑战
+    document.getElementById("hintText").textContent =
+      `💀 小夜被遗忘之主的投影击倒了……\n\n${STAT_NAMES[bestStat]}检定（难度${boss.difficulty}）：属性${totalVal} + 骰子${dice} = ${totalVal + dice}，失败❌\n\n${boss.failText}\n\n已恢复的记忆：${fogData.memoryRestored}%\n但小夜不会放弃——\"再试一次……一定能想起来……\"`;
+    switchTab('stats');
+  }
+}
+
+// ========== 自由旅行结算 ==========
+
+function freeTravelArrive() {
+  // 自由旅行：触发随机事件练属性，不给特产
+  if (!currentDest) {
+    state = STATE.IDLE;
+    updateUI();
+    return;
+  }
+  
+  const pool = eventPools[currentDest.name];
+  const eventResults = [];
+  let totalExpGained = 0;
+  
+  if (pool && pool.length > 0) {
+    const numEvents = 2 + Math.floor(Math.random() * 2);
+    const shuffled = [...pool];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    const selected = shuffled.slice(0, Math.min(numEvents, pool.length));
+    
+    for (const evt of selected) {
+      const statVal = getStatValue(evt.stat);
+      const dice = rollD6();
+      const worldBonus = worldDifficulty[currentDest.world] || 0;
+      const effectiveDifficulty = evt.difficulty + worldBonus + 2;
+      const success = (statVal + dice) >= effectiveDifficulty;
+      const expGain = success ? 20 : 5;
+      totalExpGained += expGain;
+      addStatExp(evt.stat, expGain);
+      
+      eventResults.push({
+        name: evt.name, stat: evt.stat, statVal, dice,
+        difficulty: evt.difficulty, effectiveDifficulty,
+        difficultyLabel: getDifficultyLabel(effectiveDifficulty),
+        success, expGain,
+        resultText: success ? evt.successText : evt.failText
+      });
+    }
+    saveYeStats();
+  }
+  
+  state = STATE.IDLE;
+  updateUI();
+  document.getElementById("hintText").textContent =
+    `🚀 自由旅行结束！去了${currentDest.name}，发生了${eventResults.length}件事，获得了${totalExpGained}点属性经验～吱！`;
+  lastDestName = currentDest.name;
+  switchTab('postcards');
+}
+
+// ========== UI更新 ==========
+
+function updateUI() {
+  const stateEl = document.getElementById("yeState");
+  const locEl = document.getElementById("yeLocation");
+  const timerEl = document.getElementById("timerCount");
+  const timerLabel = document.getElementById("timerLabel");
+  const progressEl = document.getElementById("progressFill");
+  const msgEl = document.getElementById("messageText");
+  const btnEl = document.getElementById("actionBtn");
+  const hintEl = document.getElementById("hintText");
+  
+  // 更新表情
+  let emoji = "happy.webp";
+  
+  // 更新迷雾/阳光模式CSS
+  const container = document.querySelector('.game-container');
+  container.classList.remove('fog-mode', 'fog-boss', 'sun-mode');
+  if (fogData.completed) {
+    container.classList.add('sun-mode');
+  } else if (state === STATE.FOG || (state === STATE.IDLE && fogData.unlocked && !fogData.completed)) {
+    container.classList.add(fogRun?.bossAvailable ? 'fog-boss' : 'fog-mode');
+  }
+  
+  // 检查迷雾解锁
+  const allCollected = isAllCollected();
+  if (allCollected && !fogData.unlocked) {
+    fogData.unlocked = true;
+    saveFogData();
+  }
+  
+  switch(state) {
+    case STATE.IDLE:
+      if (timeRemaining <= 0) {
+        // 迷雾模式可用
+        if (fogData.unlocked && !fogData.completed) {
+          stateEl.textContent = fogRun?.bossAvailable ? "🌫️ 遗忘之主就在前方" : "🌫️ 迷雾之中";
+          locEl.textContent = fogRun?.bossAvailable ? "记忆的边缘 · 黑影笼罩" : "休憩之所 · 被雾笼罩";
+          timerLabel.textContent = fogRun?.bossAvailable ? "" : "下次出发";
+          timerEl.textContent = "--:--";
+          progressEl.style.width = "0%";
+          msgEl.textContent = fogRun?.bossAvailable
+            ? "🌫️ 迷雾深处，有一个庞大的黑影在等待。\n\n那是遗忘之主的投影——\n它拿走了小夜最珍贵的记忆。\n\n必须面对它。为了那些不想忘记的人和事。"
+            : "🌫️ 不知道从什么时候开始，\n小夜发现有些记忆变得模糊了。\n\n那些去过的地方、\n笑过的瞬间、说过的话……\n\n像被雾遮住了一样，\n越来越看不清了。\n\n小夜不想忘记。\n所以，要走进那片雾里。";
+          btnEl.textContent = fogRun?.bossAvailable ? "👑 面对遗忘之主" : "🌫️ 走进迷雾";
+          btnEl.disabled = false;
+          emoji = "focus.webp";
+        } else if (fogData.completed) {
+          stateEl.textContent = "☀️ 记忆重获";
+          locEl.textContent = "休憩之所 · 阳光之中";
+          timerLabel.textContent = "下次旅行还有";
+          timerEl.textContent = "--:--";
+          progressEl.style.width = "0%";
+          msgEl.textContent = "所有的记忆都已找回！\n阳光透过窗户洒进来，暖洋洋的～\n想去哪里就去哪里吧，吱！";
+          btnEl.textContent = "🚀 自由旅行";
+          btnEl.disabled = false;
+          emoji = "happy.webp";
+        } else {
+          stateEl.textContent = currentDest ? "刚回来～🫶" : "在休憩之所等你";
+          locEl.textContent = "休憩之所 · 炉火旁";
+          timerLabel.textContent = "下次旅行还有";
+          timerEl.textContent = "--:--";
+          progressEl.style.width = "0%";
+          msgEl.textContent = currentDest 
+            ? `吱～刚从 ${lastDestName || currentDest.name} 回来了！\n\n${lastTravelStory ? lastTravelStory.join('\n\n') : '带了好多好东西回来🫶'}`
+            : "按下面的按钮，让小夜出发去旅行吧～";
+          btnEl.textContent = "送小夜出发！";
+          btnEl.disabled = false;
+          emoji = "happy.webp";
+        }
+      } else {
+        stateEl.textContent = "刚到家～";
+        locEl.textContent = "休憩之所";
+        timerLabel.textContent = "下次旅行还有";
+        timerEl.textContent = "--:--";
+        progressEl.style.width = "0%";
+        btnEl.textContent = "小夜在休息呢";
+        btnEl.disabled = true;
+        emoji = "love.webp";
+      }
+      break;
+      
+    case STATE.TRAVELING:
+      const mins = Math.floor(timeRemaining / 60);
+      const secs = timeRemaining % 60;
+      timerEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      timerLabel.textContent = "小夜正在旅途中";
+      
+      const progress = ((totalTime - timeRemaining) / totalTime) * 100;
+      progressEl.style.width = `${progress}%`;
+      
+      // 路途中的消息
+      const travelMessages = [
+        `小夜踏上了前往${currentDest.name}的旅途吱～`,
+        `穿过了一段路，周围的景色慢慢变得不一样了～`,
+        `路上遇到了一个小小的惊喜，小夜的心情更好了～`,
+        `风里的气息变了——目的地应该不远了吱！`,
+        `远远地已经能看到${currentDest.name}了！小夜加快了脚步～`
+      ];
+      const msgIdx = Math.min(
+        Math.floor(((totalTime - timeRemaining) / totalTime) * travelMessages.length),
+        travelMessages.length - 1
+      );
+      msgEl.textContent = travelMessages[msgIdx];
+      
+      stateEl.textContent = "旅途中～🚶";
+      locEl.textContent = `正在前往 ${currentDest.name}`;
+      btnEl.textContent = "旅行中...";
+      btnEl.disabled = true;
+      emoji = "think.webp";
+      break;
+      
+    case STATE.FOG:
+      const fogMins = Math.floor(timeRemaining / 60);
+      const fogSecs = timeRemaining % 60;
+      timerEl.textContent = `${String(fogMins).padStart(2, '0')}:${String(fogSecs).padStart(2, '0')}`;
+      timerLabel.textContent = fogRun?.bossAvailable ? "面对遗忘之主" : `阶段 ${(fogRun?.currentStage || 0) + 1}/10`;
+      
+      const fogProgress = ((totalTime - timeRemaining) / totalTime) * 100;
+      progressEl.style.width = `${fogProgress}%`;
+      
+      msgEl.textContent = `🌫️ 迷雾中，小夜在寻找失落的记忆……\n${fogRun?.bossAvailable ? "遗忘之主的黑影就在前方" : `当前进度：${fogRun?.passedStages || 0}/10`}`;
+      
+      stateEl.textContent = "🌫️ 迷雾之中";
+      locEl.textContent = "记忆的边缘";
+      btnEl.textContent = "抵抗遗忘...";
+      btnEl.disabled = true;
+      emoji = "focus.webp";
+      break;
+      
+    case STATE.TRAINING:
+      const trMins = Math.floor(timeRemaining / 60);
+      const trSecs = timeRemaining % 60;
+      timerEl.textContent = `${String(trMins).padStart(2, '0')}:${String(trSecs).padStart(2, '0')}`;
+      timerLabel.textContent = "自由旅行中";
+      
+      const trProgress = ((totalTime - timeRemaining) / totalTime) * 100;
+      progressEl.style.width = `${trProgress}%`;
+      
+      const trMessages = [
+        `小夜哼着歌出发啦～去${currentDest?.name}看看老朋友！`,
+        `阳光真好，小夜在路上采了一束小花，心情超棒～`,
+        `路过一片熟悉的地方，想起之前来的时候也走过这条路吱`,
+        `远远看到${currentDest?.name}了！小夜加快了脚步～`
+      ];
+      const trIdx = Math.min(Math.floor(trProgress / 100 * trMessages.length), trMessages.length - 1);
+      msgEl.textContent = trMessages[trIdx];
+      
+      stateEl.textContent = "🚶 自由旅行中";
+      locEl.textContent = `正在前往 ${currentDest?.name || '某处'}`;
+      btnEl.textContent = "旅行中...";
+      btnEl.disabled = true;
+      emoji = "happy.webp";
+      break;
+  }
+  
+  // 更新头像
+  const img = document.getElementById("avatarImg");
+  img.src = `./${emoji}`;
+  img.style.display = "block";
+  document.getElementById("avatarFallback").style.display = "none";
+  
+}
+
+function renderJourneyLog() {
+  if (document.getElementById("tab-journey")) {
+    document.getElementById("tab-journey").innerHTML = renderJourneyLogHTML();
+  }
+}
+
+function renderJourneyLogHTML() {
+  if (!journeyLog || journeyLog.length === 0) return '';
+  return journeyLog.slice(0, 20).map(log => `
+    <div class="postcard fade-slide" style="padding:10px 14px;">
+      <div class="postcard-title" style="font-size:14px;">📍 ${log.dest}</div>
+      <div class="postcard-from" style="font-size:12px;">${log.world} · ${log.count && log.count > 1 ? '第'+log.count+'次 ' : ''}${log.time}</div>
+    </div>
+  `).join("");
+}
+
+// ========== 选项卡切换 ==========
+
+function switchTab(tabId) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+  
+  event.target.closest(".tab").classList.add("active");
+  document.getElementById(`tab-${tabId}`).classList.add("active");
+  
+  if (tabId === "postcards") renderPostcards();
+  else if (tabId === "album") renderAlbum();
+  else if (tabId === "stats") renderStats();
+  else if (tabId === "equipment") renderEquipment();
+}
+
+function renderPostcards() {
+  const el = document.getElementById("tab-postcards");
+  if (postcardCollection.length === 0) {
+    if (journeyLog.length > 0) {
+      el.innerHTML = '<div style="text-align:center;padding:20px;color:#a08870;">还没有明信片呢～下面是旅途记录</div>' + renderJourneyLogHTML();
+    } else {
+      el.innerHTML = '<div style="text-align:center;padding:20px;color:#a08870;">还没有明信片呢～小夜旅行回来就会带哦！</div>';
+    }
+    return;
+  }
+  let html = postcardCollection.map(pc => `
+    ${(() => {
+      const isFogged = fogData.unlocked && !fogData.completed;
+      return `
+    <div class="postcard fade-slide">
+      ${pc.img && !isFogged ? `<div class="postcard-image"><img src="./travel_images/${pc.img}.webp" alt="${pc.dest}" onclick="openLightbox('./travel_images/${pc.img}.webp')" onerror="this.style.display='none'"></div>` : ''}
+      <div class="postcard-title">📮 ${pc.dest}</div>
+      <div class="postcard-from">${pc.world} · ${pc.isRevisit ? '第'+pc.visitCount+'次到访 ✨' : '初次到访 🌟'} · ${pc.time}</div>
+      ${isFogged
+        ? `<div style="margin-top:8px;padding:14px;background:#e8e0d4;border-radius:6px;text-align:center;color:#a09888;font-size:13px;line-height:1.8;">
+            <div>🌫️</div>
+            <div>那张明信片上的字迹……</div>
+            <div>小夜记得有人给自己写过什么，</div>
+            <div>但雾太浓了，看不清了。</div>
+            <div style="margin-top:6px;font-size:12px;color:#b0a898;">只记得……是很重要的人</div>
+          </div>`
+        : `<div class="postcard-text" style="white-space:pre-line;">${pc.story ? pc.story.join('\n\n') : pc.desc}</div>`
+      }
+      ${!isFogged && pc.events && pc.events.length > 0 ? pc.events.map(e => `
+        <div style="margin-top:8px;padding:8px;background:#f5f0e8;border-radius:6px;font-size:13px;">
+          <b>🎲 ${e.name}</b><br>
+          <span style="color:#8b7355;">${e.desc}</span><br>
+          <span style="color:#6a5a4a;">${STAT_NAMES[e.stat]}检定（难度${e.effectiveDifficulty || e.difficulty}${e.difficultyLabel || ''}）：属性${e.statVal} + 骰子${e.dice} = ${e.statVal+e.dice}${e.success ? '，成功✅' : '，失败❌'}</span><br>
+          <span>${e.resultText}</span><br>
+          <span style="color:#a07040;">获得${STAT_NAMES[e.stat]}经验+${e.expGain}</span>
+          ${e.gotAccessory ? `<br><span style="color:#9b59b6;">✨ 获得饰品：${(() => { const p = getAccessoryIcon(e.gotAccessory.name); return p ? `<img src="${p}" style="width:20px;height:20px;vertical-align:middle;border-radius:3px;"> ` : '✨ '; })()}${e.gotAccessory.name}</span>` : ''}
+        </div>
+      `).join('\n') : ''}
+    </div>`;
+    })()}
+  `).join("");
+  
+  // 旅行统计（小图标）
+  const totalTrips = journeyLog.length;
+  const visitedDests = new Set(journeyLog.map(l => l.dest)).size;
+  if (totalTrips > 0) {
+    html += '<div style="margin-top:16px;padding:12px;background:#f0e6d8;border-radius:8px;font-size:13px;color:#6a5a4a;text-align:center;">';
+    html += `🚀 共 ${totalTrips} 次旅行 · 🗺️ ${visitedDests} 个目的地`;
+    html += '</div>';
+  }
+  
+  el.innerHTML = html;
+}
+
+// === 特产图标映射（自动生成）===
+const itemIconMap = {
+  "乌鸦羽毛": "items/item_001.webp",
+  "余烬火花": "items/item_002.webp",
+  "倒影水晶": "items/item_003.webp",
+  "假面碎片": "items/item_004.webp",
+  "冰晶石": "items/item_005.webp",
+  "冻原蜂蜜": "items/item_006.webp",
+  "冻结的泪滴": "items/item_007.webp",
+  "发光棱镜": "items/item_008.webp",
+  "发光珍珠": "items/item_009.webp",
+  "发条钥匙": "items/item_010.webp",
+  "古老城市地图碎片": "items/item_011.webp",
+  "古老歌谣碎片": "items/item_012.webp",
+  "古老盾牌残片": "items/item_013.webp",
+  "古老钟锤": "items/item_014.webp",
+  "大人证书复印件": "items/item_015.webp",
+  "太阳徽记": "items/item_016.webp",
+  "孩子的画本": "items/item_017.webp",
+  "宁静之歌": "items/item_018.webp",
+  "巨人石碎片": "items/item_019.webp",
+  "巨木年轮": "items/item_020.webp",
+  "干花书签": "items/item_021.webp",
+  "微笑指南手册": "items/item_022.webp",
+  "怀表链条": "items/item_023.webp",
+  "手术刀碎片": "items/item_024.webp",
+  "扫帚尾须": "items/item_025.webp",
+  "折射之眼": "items/item_026.webp",
+  "教堂玻璃碎": "items/item_027.webp",
+  "无声哨子": "items/item_028.webp",
+  "无声铃铛": "items/item_029.webp",
+  "旧面具残片": "items/item_030.webp",
+  "时针别针": "items/item_031.webp",
+  "星形护身符": "items/item_032.webp",
+  "极光色线团": "items/item_033.webp",
+  "染泪的手帕": "items/item_034.webp",
+  "树汁墨水": "items/item_035.webp",
+  "树脂封存的萤火虫": "items/item_036.webp",
+  "橡果吊坠": "items/item_037.webp",
+  "水晶碎片": "items/item_038.webp",
+  "水晶髓液": "items/item_039.webp",
+  "沉船铜币": "items/item_040.webp",
+  "泪水结晶": "items/item_041.webp",
+  "海妖鳞片": "items/item_042.webp",
+  "深海回音螺": "items/item_043.webp",
+  "湖底鹅卵石": "items/item_044.webp",
+  "湖水碎片": "items/item_045.webp",
+  "湿透的信": "items/item_046.webp",
+  "灵魂余响": "items/item_047.webp",
+  "熄灭的烛台": "items/item_048.webp",
+  "熏黑的羽毛": "items/item_049.webp",
+  "珊瑚碎片": "items/item_050.webp",
+  "画布碎片": "items/item_051.webp",
+  "白色蜡笔": "items/item_052.webp",
+  "矿工头灯": "items/item_053.webp",
+  "祭祀场灰烬": "items/item_054.webp",
+  "绷紧的琴弦": "items/item_055.webp",
+  "花后祝福": "items/item_056.webp",
+  "花香信纸": "items/item_057.webp",
+  "苔藓标本": "items/item_058.webp",
+  "荆棘花瓣": "items/item_059.webp",
+  "营火灰烬": "items/item_060.webp",
+  "薰衣草干花": "items/item_061.webp",
+  "蜡封祈祷词": "items/item_062.webp",
+  "蝴蝶鳞粉瓶": "items/item_063.webp",
+  "蝶翼粉末": "items/item_064.webp",
+  "螺旋剑碎片": "items/item_065.webp",
+  "褪色的玩具": "items/item_066.webp",
+  "计时沙漏": "items/item_067.webp",
+  "铁锈箭镞": "items/item_068.webp",
+  "银色碎片": "items/item_069.webp",
+  "防火女的泪滴": "items/item_070.webp",
+  "防火女眼眸": "items/item_071.webp",
+  "雨滴风铃": "items/item_072.webp",
+  "雪花结晶": "items/item_073.webp",
+  "雪鼠毛绒球": "items/item_074.webp",
+  "雾中花瓣": "items/item_075.webp",
+  "雾之结晶": "items/item_076.webp",
+  "骑士纽扣": "items/item_077.webp",
+  "魔女饼干": "items/item_078.webp",
+  "鲸骨雕刻": "items/item_079.webp",
+  "齿轮碎片": "items/item_080.webp",
+  "融雪毛巾": "items/item_081.webp",
+  "浴池木塞": "items/item_082.webp",
+  "热蒸汽结晶": "items/item_083.webp",
+  "肥皂碎片": "items/item_084.webp",
+  "温热回忆": "items/item_085.webp",
+  "旧地图碎片": "items/item_086.webp",
+  "街灯灯泡": "items/item_087.webp",
+  "用过的铅笔": "items/item_088.webp",
+  "城市指南书": "items/item_089.webp",
+  "标记贴纸": "items/item_090.webp",
+  "飞机螺丝": "items/item_091.webp",
+  "风干鱼干": "items/item_092.webp",
+  "飞行图纸": "items/item_093.webp",
+  "工具零件": "items/item_094.webp",
+  "塔顶风向标": "items/item_095.webp",
+  "阶梯碎石": "items/item_096.webp",
+  "扶手铁锈": "items/item_097.webp",
+  "上层空气瓶": "items/item_098.webp",
+  "回音贝壳": "items/item_099.webp",
+  "攀登稻草绳": "items/item_100.webp",
+  "雪原冰晶": "items/item_101.webp",
+  "日出暖石": "items/item_102.webp",
+  "雪球样本": "items/item_103.webp",
+  "空白日记": "items/item_104.webp",
+  "终末之风": "items/item_105.webp",
+  "手工曲奇": "items/item_106.webp",
+  "妖精糖罐": "items/item_107.webp",
+  "红茶杯": "items/item_108.webp",
+  "楠木树叶标本": "items/item_109.webp",
+  "妖精的小帽子": "items/item_110.webp",
+  "奇怪零件": "items/item_111.webp",
+  "妖精尺寸扳手": "items/item_112.webp",
+  "不明机器说明书": "items/item_113.webp",
+  "多余螺丝": "items/item_114.webp",
+  "未完成品": "items/item_115.webp",
+  "棒棒糖花": "items/item_116.webp",
+  "巧克力树果": "items/item_117.webp",
+  "棉花糖云": "items/item_118.webp",
+  "砂糖结晶": "items/item_119.webp",
+  "妖精的食谱": "items/item_120.webp",
+  "夏尔烟叶": "items/item_121.webp",
+  "蜂蜜酒": "items/item_122.webp",
+  "袋底洞钥匙扣": "items/item_123.webp",
+  "宴会树花瓣": "items/item_124.webp",
+  "霍比特食谱": "items/item_125.webp",
+  "精灵树叶": "items/item_126.webp",
+  "瀑布露珠": "items/item_127.webp",
+  "古老诗歌抄本": "items/item_128.webp",
+  "暮星碎片": "items/item_129.webp",
+  "埃尔隆德的药水": "items/item_130.webp",
+
+  // === 休憩之所 新特产 ===
+  "炉火余温石": "items/item_131.webp",
+  "热可可杯": "items/item_132.webp",
+  "羊毛毯角": "items/item_133.webp",
+  "壁炉木柴香": "items/item_134.webp",
+  "晚安故事书": "items/item_135.webp",
+  "旧车票存根": "items/item_136.webp",
+  "旅行相片碎片": "items/item_137.webp",
+  "干花书签": "items/item_138.webp",
+  "手写明信片": "items/item_139.webp",
+  "记忆水晶球": "items/item_140.webp",
+  "温泉馒头": "items/item_141.webp",
+  "竹筒水勺": "items/item_142.webp",
+  "柚子香包": "items/item_143.webp",
+  "温泉蛋": "items/item_144.webp",
+  "毛巾小兔": "items/item_145.webp",
+  "星座图碎片": "items/item_146.webp",
+  "月光瓶": "items/item_147.webp",
+  "星沙计时器": "items/item_148.webp",
+  "夜风风铃": "items/item_149.webp",
+  "旧书签": "items/item_150.webp",
+  "羽毛笔": "items/item_151.webp",
+  "墨水小瓶": "items/item_152.webp",
+  "皮面笔记本": "items/item_153.webp",
+  "枯叶标本": "items/item_154.webp",
+  "探窟家指南书": "items/item_155.webp",
+  "绳梯残段": "items/item_156.webp",
+  "上升诅咒符": "items/item_157.webp",
+  "深渊地图碎片": "items/item_158.webp",
+  "白笛碎片": "items/item_159.webp",
+  "天台蔓叶片": "items/item_160.webp",
+  "暖池温泉水": "items/item_161.webp",
+  "穿弹兽外壳碎片": "items/item_162.webp",
+  "发光孢子": "items/item_163.webp",
+  "娜娜奇香草": "items/item_164.webp",
+  "珊瑚骨片": "items/item_165.webp",
+  "发光水母瓶": "items/item_166.webp",
+  "龙鬃螺鸠鳞片": "items/item_167.webp",
+  "深海盐结晶": "items/item_168.webp",
+  "不灭灯花": "items/item_169.webp",
+  "价值货币": "items/item_170.webp",
+  "记忆之卵": "items/item_171.webp",
+  "生骸面具": "items/item_172.webp",
+  "甘嘉队徽章": "items/item_173.webp",
+  "诅咒灯笼": "items/item_174.webp",
+  "齿轮零件": "items/item_175.webp",
+
+};
+function getItemIcon(name) {
+  return itemIconMap[name] || "";
+}
+
+// === 饰品图标映射 ===
+const accessoryIconMap = {
+  "暖炉守护符": "accessories/acc_001.webp",
+  "旅途相册": "accessories/acc_002.webp",
+  "柚子香囊": "accessories/acc_003.webp",
+  "星图碎片": "accessories/acc_004.webp",
+  "古老书签": "accessories/acc_005.webp",
+  "玫瑰刺": "accessories/acc_006.webp",
+  "湖光碎片": "accessories/acc_007.webp",
+  "雨泪瓶": "accessories/acc_008.webp",
+  "棱晶碎片": "accessories/acc_009.webp",
+  "银骑士徽记": "accessories/acc_010.webp",
+  "余烬之心": "accessories/acc_011.webp",
+  "巨人骨粉": "accessories/acc_012.webp",
+  "雪花结晶": "accessories/acc_013.webp",
+  "初火余温": "accessories/acc_014.webp",
+  "扫帚尾羽": "accessories/acc_015.webp",
+  "齿轮零件": "accessories/acc_016.webp",
+  "褪色蜡笔": "accessories/acc_017.webp",
+  "微笑面具": "accessories/acc_018.webp",
+  "树洞钥匙": "accessories/acc_019.webp",
+  "极地护符": "accessories/acc_020.webp",
+  "深海的歌": "accessories/acc_021.webp",
+  "雪原暖玉": "accessories/acc_022.webp",
+  "旧灯泡": "accessories/acc_023.webp",
+  "飞行图纸": "accessories/acc_024.webp",
+  "螺旋石屑": "accessories/acc_025.webp",
+  "静寂之证": "accessories/acc_026.webp",
+  "白笛碎片": "accessories/acc_027.webp",
+  "穿弹兽的棘": "accessories/acc_028.webp",
+  "不灭灯芯": "accessories/acc_029.webp",
+  "价值硬币": "accessories/acc_030.webp",
+  "妖精曲奇": "accessories/acc_031.webp",
+  "小零件": "accessories/acc_032.webp",
+  "棒棒糖花": "accessories/acc_033.webp",
+  "宴会花瓣": "accessories/acc_034.webp",
+  "精灵叶": "accessories/acc_035.webp"
+};
+function getAccessoryIcon(name) {
+  return accessoryIconMap[name] || "";
+}
+
+// ========== 旅途故事生成 ==========
+// isRevisit=true 时会用不同的故事版本
+
+function generateTravelStory(dest, isRevisit, visitCount) {
+  
+  // ===== 按世界氛围分类的专属旅行文本 =====
+  const worldVibes = {
+    "空洞骑士": {
+      first: [
+        { start: "小夜沿着昏暗的通道前行，墙上的发光苔藓照亮了路。",
+          middle: ["头顶的岩壁上嵌着发光矿石，像星星一样点缀在黑暗中。", "远处传来水珠滴落的回音，空洞而悠长。", "空气里有一股潮湿的石头味，混杂着古老的气息。", "小夜摸了摸墙上古老的刻印，不知道是谁在多久前留下的。"],
+          near: "隧道尽头透出微光——快到${dest.name}了",
+          arrive: "终于到了${dest.name}！${dest.desc}。虽然在地底深处，但这里的景色让小夜看得入迷了吱～" },
+        { start: "这次的路要经过一段狭窄的岩缝，小夜侧着身子挤了过去。",
+          middle: ["一只发光的蝴蝶在旁边飞舞，像是在给小夜带路。", "脚下的石板路有些松动，小夜小心翼翼地踩过去。", "洞穴深处传来细微的嗡嗡声，应该是某种地下虫子在活动。"],
+          near: "前方出现了一片开阔的空间——${dest.name}快到了吱！",
+          arrive: "到达${dest.name}！${dest.desc}。在地底深处能看到这样的景象，小夜觉得超值～" }
+      ],
+      revisit: [
+        { start: "再次走进地下通道，这一次小夜带了一盏更大的提灯。",
+          middle: ["上次经过的地方还有些印象，但换了角度之后感觉完全不一样了。", "一只发光的蝴蝶停在岩壁上，像是还记得小夜。", "地底的回音还是那么特别，小夜试着喊了一声，听到了层层叠叠的回声。"],
+          near: "又看到了那片熟悉的岩壁——${dest.name}就在前面了",
+          arrive: "又到${dest.name}了吱！${dest.desc}。地下世界的角落好像永远探索不完呢～" }
+      ]
+    },
+    "黑暗之魂": {
+      first: [
+        { start: "小夜踏上了一片苍凉的土地，空气中弥漫着灰烬的味道。",
+          middle: ["周围是残破的建筑遗迹，石缝里长着枯黄的野草。", "风穿过残垣断壁发出呜咽般的声音，让人心里有些沉重。", "远处可以看到巨大的废墟轮廓，曾经一定非常宏伟。", "地面上散落着锈蚀的盔甲碎片，不知是什么人留下的。"],
+          near: "穿过最后一片灰烬，${dest.name}的身影在暮色中浮现",
+          arrive: "终于到了${dest.name}……${dest.desc}。虽然有些荒凉，但有种特别的美感，小夜在心里默默记下了这里的模样吱。" },
+        { start: "小夜出发前往${dest.name}，今天的天空灰蒙蒙的，像一层薄纱盖住了世界。",
+          middle: ["路上经过一座倒塌的拱门，上面爬满了干枯的藤蔓。", "有只乌鸦停在残柱上看着小夜，歪了歪头，然后飞走了。", "地面上有被火烧过的痕迹，黑黑的烟灰混在泥土里。"],
+          near: "翻过一个小坡，${dest.name}就在眼前了",
+          arrive: "到了，这里就是${dest.name}。${dest.desc}。虽然有点寂寞，但小夜觉得这样的地方也有它的故事吱～" }
+      ],
+      revisit: [
+        { start: "又回到了这片苍凉的大地，这次小夜心里没有那么紧张了。",
+          middle: ["上次看到的废墟，这次从另一个方向看过去，有种不同的感觉。", "风吹过耳边的声音有些熟悉，像是在说'你又来了呀'。", "灰烬的味道还是一样浓，但小夜已经有点习惯了。"],
+          near: "${dest.name}的轮廓出现在视野里，依旧是那个安静的样子",
+          arrive: "回到${dest.name}了吱！${dest.desc}。每次来都能发现一些上次没注意到的小细节呢～" }
+      ]
+    },
+    "魔女之旅": {
+      first: [
+        { start: "小夜循着奇妙的气息踏上了旅途，前方看起来就是个不普通的地方。",
+          middle: ["路边的花闪着微微的荧光，好像被施了魔法。", "空气中弥漫着一种甜而不腻的香气，像是有魔女刚经过不久。", "头顶的云彩形状很奇怪，有的像兔子，有的像城堡。", "小夜总觉得有什么在暗中观察自己，但回头又什么都没看到。"],
+          near: "前方的景象越来越梦幻——${dest.name}要到了！",
+          arrive: "哇——${dest.name}！${dest.desc}。果然是个充满魔法的世界吱，小夜的眼睛都不够用了🫶" },
+        { start: "今天小夜要去的地方据说很特别，连空气都跟别处不一样。",
+          middle: ["路边站着一排形状一模一样的石头，像是被谁故意摆在那里的。", "一阵风吹过，带来了远处钟楼的钟声。", "草丛里有什么在发亮，小夜凑近看了看——是一块糖果一样的石头。"],
+          near: "拐过一个弯，${dest.name}出现在眼前了！",
+          arrive: "到啦！${dest.name}果然没让失望，${dest.desc}。小夜好想在这里多待一会儿吱～" }
+      ],
+      revisit: [
+        { start: "再次前往那个奇妙的世界，小夜这次带了一本空白的笔记本。",
+          middle: ["上次那朵发光的花已经谢了，但旁边又开了一朵不同颜色的。", "空气里的香味还是那么熟悉，像某种魔药的味道。", "今天的云彩又换了形状，小夜忍不住多看了几眼。"],
+          near: "${dest.name}就在前面了，还是那副梦幻的样子",
+          arrive: "又来啦吱！${dest.desc}。每次来都会发现新的奇妙之处——这就是魔法世界呀🫶" }
+      ]
+    },
+    "奇诺之旅": {
+      first: [
+        { start: "小夜走向人类聚居的方向，远远就能看到整齐的房屋和道路。",
+          middle: ["路修得很整齐，跟荒郊野外的路完全不一样。", "偶尔有人从旁边经过，打量着小夜的鼠耳，然后又移开了目光。", "路边有路牌和路灯，一切井井有条但总觉得少了点什么。", "远处传来机械的声响，像是这个国家运转的脉搏。"],
+          near: "慢慢走近了——这就是${dest.name}",
+          arrive: "到了${dest.name}。${dest.desc}。这里的人有自己的一套规则，小夜边走边看，心里有很多想法吱。" },
+        { start: "今天要去的地方是一个……有点特别的国度。小夜整理好心情出发了。",
+          middle: ["路两边是修建整齐的树篱，但太过整齐反而有点不自然。", "遇到一个背着大包的人，他说自己也是旅人，刚从那个国家出来。", "经过一座白色的小亭子，里面空无一人，桌上放着一杯还温热的茶。"],
+          near: "国境线就在前方，${dest.name}要到了",
+          arrive: "到啦。${dest.desc}。小夜在这个国度里走了很久，想了很多事情吱。" }
+      ],
+      revisit: [
+        { start: "又踏上了前往那个国度的路，这次小夜的心情复杂了不少。",
+          middle: ["还是那条整齐的路，但小夜这次注意到了一个之前没看到的细节。", "路边那个亭子还在，但杯子里已经没有茶了。", "路牌上好像多了几道划痕，不知道是不是新留下的。"],
+          near: "又看到那座国境的标志了",
+          arrive: "又回来了吱。${dest.desc}。第二次看，看到的又是不一样的东西呢～" }
+      ]
+    },
+    "小夜的秘密": {
+      first: [
+        { start: "小夜走在熟悉的路上，那里充满了让人安心的气息。",
+          middle: ["壁炉里的火光透过窗户映在路上，暖洋洋的。", "架子上新添了几本书，小夜忍不住翻了翻。", "木地板在脚下发出轻微的吱呀声，听起来很舒服。", "窗台上放着一盆小花，叶子上还挂着水珠，好像刚被浇过水。"],
+          near: "前面就是${dest.name}了，小夜加快了脚步",
+          arrive: "到了！${dest.dest}。推开门的瞬间，小夜就觉得——嗯，这里是家吱🫶" },
+        { start: "出发去一个让人安心的地方吱～小夜带了些刚烤好的饼干。",
+          middle: ["路上经过一片被阳光照暖的地方，小夜眯起了眼睛。", "草丛里传来蟋蟀的叫声，悠闲又自在。", "风吹过带来了远处厨房里飘来的香味，小夜的肚子适时地叫了一声。"],
+          near: "${dest.name}近在眼前啦～",
+          arrive: "到了吱！${dest.desc}。这里就是让小夜觉得最安心最幸福的地方🫶" }
+      ],
+      revisit: [
+        { start: "回家咯吱～这条路走了好多次，但每次走的心情都不太一样。",
+          middle: ["窗台上那盆花好像比上次长大了一些。", "架子上有人新摆了一个小摆件，小夜拿起来看了又看，又小心地放回去了。", "熟悉的角落总有新的温度，这就是小夜最喜欢的家的感觉。"],
+          near: "前方就是${dest.name}了，窗户里透着温暖的灯光",
+          arrive: "回到家了吱！${dest.desc}。不管去多远的地方，回来的时候心里总是暖洋洋的🫶" }
+      ]
+    },
+    "环世界": {
+      first: [
+        { start: "小夜裹紧了厚厚的斗篷，踏入了风雪之中。",
+          middle: ["四周白茫茫一片，分不清天和地，只有风声在耳边呼啸。", "脚下的雪嘎吱嘎吱响，每一步都留下深深的脚印。", "小夜搓了搓手，呼出的白气立刻就消失在了寒风中。", "偶尔能看到雪地上有小动物的脚印，延伸到远处消失了。"],
+          near: "风雪中隐约出现了建筑的轮廓——${dest.name}就在前方了",
+          arrive: "到了……${dest.name}。${dest.desc}。虽然冷得要命，但那种原始的壮美让小夜看了好久吱❄️" },
+        { start: "今天小夜出发去一个很冷很冷的地方，穿了三层衣服还是觉得不够。",
+          middle: ["寒风像刀子一样刮在脸上，小夜把围巾往上拉了拉。", "天空是浅灰色的，雪地是白色的，世界仿佛只剩下了这两种颜色。", "路过一个雪堆时，下面好像有什么在动——原来是一只冬眠的小动物。"],
+          near: "看！${dest.name}就在风雪的那一边",
+          arrive: "终于到了${dest.name}。${dest.desc}。小夜冻得耳朵都红了，但心里却觉得很值得吱～" }
+      ],
+      revisit: [
+        { start: "又穿上了厚厚的衣服，小夜再次踏入了那片雪白的世界。",
+          middle: ["上次的脚印已经被新雪覆盖了，世界又变成了一张白纸。", "风还是那么大，但这次小夜带了个暖手的小炉子。", "雪地上又有新的动物脚印，跟上次看到的有点不一样。"],
+          near: "远远地看到了${dest.name}的影子，在风雪中屹立着",
+          arrive: "又回来了吱！${dest.desc}。这片冰原虽然冷，但有种让人想念的安静呢❄️" }
+      ]
+    },
+    "深海": {
+      first: [
+        { start: "小夜深吸一口气，潜入了幽蓝的海水之中。",
+          middle: ["阳光在水面变成波光粼粼的碎片，越往下越安静。", "一群银白色的小鱼从旁边游过，好奇地围着小夜转了一圈。", "四周是深邃的蓝色，只有远处发光的珊瑚像星星一样闪烁。", "水流的温度慢慢变凉，小夜知道自己在向深处去。"],
+          near: "前方隐约能看到沉没的建筑——就是${dest.name}了",
+          arrive: "到了……${dest.name}。${dest.desc}。水下的世界安静得让人想屏住呼吸，小夜觉得自己在看一个被时间遗忘的梦吱🌊" },
+        { start: "今天去海底！小夜检查了一下身上防水的小包裹就出发了。",
+          middle: ["越往下光线越暗，但发光的海藻给周围铺上了一层淡蓝色的光。", "一只水母慢慢地飘了过去，触手像丝带一样柔软。", "水流忽然变强了，小夜抓住了旁边的一块礁石等水流过去。"],
+          near: "透过幽蓝的海水，${dest.name}的轮廓慢慢浮现",
+          arrive: "到了！${dest.desc}。在这个海底世界里，时间仿佛真的停止了吱🌊" }
+      ],
+      revisit: [
+        { start: "再次潜入那片幽蓝的海底，这次小夜带了一颗发光的石头。",
+          middle: ["上次遇到鱼群的地方，这次来了一只巨大的海龟。", "水流的方向好像跟上一次不太一样，小夜慢慢适应着。", "海底的沉沙被搅动起来，像一片金色的雾。"],
+          near: "${dest.name}从前方的暗蓝色中浮现出来",
+          arrive: "又来到海底了吱！${dest.desc}。每次下潜都能发现新的细节，这就是深海的魅力呀🌊" }
+      ]
+    },
+    "少女终末旅行": {
+      first: [
+        { start: "小夜走在空旷的废墟中，风穿过破败的建筑发出空洞的声响。",
+          middle: ["地上散落着旧时代的遗物——锈蚀的铁罐、泛黄的纸片、破碎的玻璃。", "一道光束从天花板的裂缝里照下来，照亮了飞舞的尘埃。", "阶梯向上延伸，看不到尽头，小夜一级一级地往上走。", "到处都是人类曾经生活过的痕迹，但现在只剩下了安静。"],
+          near: "穿过一段昏暗的通道，${dest.name}出现在眼前",
+          arrive: "到了……${dest.name}。${dest.desc}。这里的空旷让小夜既感到寂寞，又感到一种奇怪的自由吱。" },
+        { start: "小夜走进了这片被时间遗忘的世界，周围的一切都在无声地诉说着什么。",
+          middle: ["一扇半开的门在风中轻轻摇晃，发出吱呀吱呀的声音。", "地上有一个被遗忘的布偶娃娃，布面已经褪色了。", "抬眼望去，层层叠叠的建筑轮廓像一座巨大的迷宫。"],
+          near: "顺着一条蜿蜒的上坡路，${dest.name}越来越近了",
+          arrive: "到了。${dest.desc}。小夜站了一会儿，感受着风从耳边吹过的声音——这个世界虽然寂寞，但很美吱。" }
+      ],
+      revisit: [
+        { start: "再次穿梭在废墟之间，这次小夜认出了上次经过的路标。",
+          middle: ["那个布偶还在老地方，风吹日晒让它变得更加褪色了。", "上次听到的金属碰撞声还在，不知道是什么东西发出的。", "小夜在这片寂静中听到了自己的脚步声，一下一下，清晰而坚定。"],
+          near: "前方的景象越来越熟悉了——${dest.name}就在那里",
+          arrive: "又回到了这里吱。${dest.desc}。废墟不会改变，但每次来的时候，小夜的心情都不一样。" }
+      ]
+    },
+    "人类衰退之后": {
+      first: [
+        { start: "小夜走进了这个充满神秘气息的世界，空气中飘着一股甜甜的味道。",
+          middle: ["路边的小东西看起来像是手工做的，但又不确定是谁做的。", "草丛里有什么在闪闪发光——是半颗包着彩色糖纸的糖果。", "远处传来小小的声响，好像有什么在偷偷看着小夜。", "空气中弥漫着一种说不出的甜香，像是烤蛋糕又像是花果的香气。"],
+          near: "穿过一段有趣的小路，${dest.name}就在眼前了！",
+          arrive: "到啦！${dest.desc}。这个世界虽然人类不在了，但似乎被其他可爱的小家伙们接管了呢吱🫶" },
+        { start: "今天去的地方听说充满了奇妙的小秘密，小夜带着好奇出发了。",
+          middle: ["路边有用小石子摆成的箭头，好像在给小夜指路。", "树上挂着小小的手工饰品，随风轻轻晃动。", "地面有一些很小的脚印，不知道是什么生物留下的。"],
+          near: "不远处就是${dest.name}了，已经能看到标志性的建筑了",
+          arrive: "到了！${dest.desc}。这里的一切都让觉得又温暖又有点寂寞，像是被温柔地遗忘了吱。" }
+      ],
+      revisit: [
+        { start: "再次拜访这个可爱的世界，小夜带了一些糖果放在路边。",
+          middle: ["上次留的小石子箭头还在，旁边又多了一个新箭头。", "树上多了新的小装饰，不知道是风带来的还是谁挂上去的。", "草丛里好像藏着什么在观察小夜，但小夜假装没发现，怕吓到它们。"],
+          near: "${dest.name}还是那副温柔的样子，安安静静地在那里",
+          arrive: "回来啦吱～${dest.desc}。这里就像是被童话遗落的一角，总能让人心情变好🫶" }
+      ]
+    },
+    "指环王": {
+      first: [
+        { start: "小夜踏上了一片诗意盎然的土地，连空气都格外清新。",
+          middle: ["绿草如茵的山坡延伸到天边，远处有炊烟袅袅升起。", "一条清澈的小溪蜿蜒流过，水底的石子被阳光照得发亮。", "风吹过树梢，带来树叶沙沙的声音和泥土的芬芳。", "路边的野花开得正盛，淡紫和白色交织在一起，像一幅画。"],
+          near: "翻过一座小丘，${dest.name}的景色铺展在眼前——太美了！",
+          arrive: "到啦！${dest.desc}。小夜觉得这里美得不像是真实存在的地方，忍不住深吸了一口气吱🌿" },
+        { start: "小夜前往传说中美丽的地方，连脚步都变得轻盈了起来。",
+          middle: ["阳光透过树叶洒下来，在地上画出斑驳的光影。", "风里带着花香和远处瀑布的水汽，格外清新。", "一群蝴蝶从旁边飞过，五彩斑斓的翅膀在阳光下闪闪发光。"],
+          near: "前方传来了流水的声音——快到${dest.name}了",
+          arrive: "到了！${dest.desc}。这里就像传说中的一样美，小夜真的好喜欢吱🫶" }
+      ],
+      revisit: [
+        { start: "再次踏上这片美丽的土地，小夜的心情像天空一样晴朗。",
+          middle: ["上次看到的那片花田还在开，而且比上次更绚烂了。", "溪水还是那么清澈，小夜蹲下来用手拨了拨水面。", "那些老树依然是那么安详地站在那里，像是跨越了漫长的时间。"],
+          near: "${dest.name}从绿叶和花朵之间探出头来，像老朋友在招手",
+          arrive: "又回来了吱～${dest.desc}。不管来多少次，都觉得这里美得让人心动🫶" }
+      ]
+    },
+    "来自深渊": {
+      first: [
+        { start: "小夜站在深渊的边缘，向下望去——深不见底。深吸一口气，开始下探。",
+          middle: ["岩壁上挂着奇怪的植物，在幽暗中发出微微的光。", "越往下空气越潮湿，温度也在慢慢变化。", "周围的环境越来越奇特——已经不是在普通世界的感觉了。", "下方传来某种低沉的声音，像是深渊在呼吸。"],
+          near: "经过了漫长而奇异的下降，${dest.name}终于快到了",
+          arrive: "到了……${dest.name}。${dest.desc}。这个深渊的世界远比小夜想象中更不可思议，心中涌起了一种复杂的情绪吱。" },
+        { start: "小夜扣好安全绳，再次向深渊深处出发。",
+          middle: ["周圍的岩层呈现出层层叠叠的奇异纹理，像记录着漫长的时间。", "某种不知名的生物快速地从视野边缘掠过。", "空气中飘浮着细小的发光微粒，像尘埃一样静静地舞动。"],
+          near: "前方出现了${dest.name}特有的景象——快到了",
+          arrive: "到达${dest.name}！${dest.desc}。这里的每一寸都透着神秘和危险，但也让人移不开眼睛吱。" }
+      ],
+      revisit: [
+        { start: "再次向深渊中下降，这一次小夜的脚步更加坚定。",
+          middle: ["岩壁上的发光植物比上次更亮了，像是在欢迎小夜回来。", "那种低沉的声音还在，但小夜已经不再害怕了。", "周围的景色虽然第二次见，但仍然让人感到震撼。"],
+          near: "${dest.name}在深渊的某处等待着小夜",
+          arrive: "又回到了这里吱。${dest.desc}。深渊的秘密不是一次就能看尽的，所以小夜才一再来访呀。" }
+      ]
+    }
+  };
+  
+  // 兜底模板（如果有世界没匹配到）
+  const fallback = {
+    first: [
+      { start: "小夜背着小包裹出发了吱～",
+        middle: ["一路上风景在变，小夜的心情也跟着雀跃起来。", "风从耳边吹过，带来了远方的气息。", "走着走着，路变得越来越有意思了。"],
+        near: "前方就是${dest.name}了，小夜加快了脚步",
+        arrive: "到了！${dest.desc}。这里比想象中更有意思，小夜转了好几圈🫶" }
+    ],
+    revisit: [
+      { start: "再次出发去${dest.name}吱～",
+        middle: ["路上有些熟悉的景色，但每次看都有新的感觉。", "风的方向好像跟上一次不太一样。", "小夜哼着上次来的时候唱的那首歌，脚步轻快。"],
+        near: "${dest.name}就在前面了",
+        arrive: "又来了吱！${dest.desc}。每次来都能发现新的东西呢🫶" }
+    ]
+  };
+  
+  const vibes = worldVibes[dest.world] || fallback;
+  const pool = isRevisit ? vibes.revisit : vibes.first;
+  const idx = isRevisit
+    ? Math.min((visitCount - 2) % pool.length, pool.length - 1)
+    : 0;
+  const template = pool[idx];
+  
+  const fillDest = (str) => str.replace(/\$\{dest\.(\w+)\}/g, (_, key) => dest[key] || '');
+  
+  const startText = fillDest(template.start);
+  const middleText = fillDest(template.middle[Math.floor(Math.random() * template.middle.length)]);
+  const nearText = fillDest(template.near);
+  const arriveText = fillDest(template.arrive);
+  
+  return [startText, middleText, nearText, arriveText];
+}
+
+// ========== 删档重玩 ==========
+let resetPending = false;
+
+function confirmReset() {
+  const btn = document.getElementById("resetBtn");
+  if (!resetPending) {
+    resetPending = true;
+    btn.textContent = "⚠️ 真的删掉吗？再点一次确认";
+    btn.style.background = "#8a2a2a";
+    setTimeout(() => {
+      resetPending = false;
+      btn.textContent = "🗑️ 删档重玩";
+      btn.style.background = "#6a3a3a";
+    }, 8000);
+  } else {
+    // 删档
+    localStorage.removeItem("yeJourneyLog");
+    localStorage.removeItem("yePostcards");
+    localStorage.removeItem("yeSouvenirs");
+    localStorage.removeItem("yeDestTracker");
+    localStorage.removeItem("yeFogData");
+    
+    journeyLog = [];
+    postcardCollection = [];
+    souvenirCollection = [];
+    destinationTracker = {};
+    fogData = { unlocked: false, completed: false, bestStages: 0, memoryRestored: 0 };
+    lastTravelStory = null;
+    lastDestName = null;
+    currentDest = null;
+    
+    resetPending = false;
+    btn.textContent = "🗑️ 删档重玩";
+    btn.style.background = "#6a3a3a";
+    
+    document.getElementById("hintText").textContent = "小夜的记忆全部清空啦～可以重新出发了吱🫶";
+    updateUI();
+    switchTab('stats');
+  }
+}
+
+// ========== 保存/加载进度 ==========
+
+function saveProgress() {
+  const data = {
+    journeyLog,
+    postcardCollection,
+    souvenirCollection,
+    destinationTracker,
+    fogData,
+    savedAt: new Date().toLocaleString()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `小夜旅行存档_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  
+  const hint = document.getElementById("hintText");
+  hint.textContent = "💾 进度保存好啦～下次打开点「读取进度」就能恢复吱！";
+  setTimeout(() => { hint.textContent = "小夜在休憩之所等你回来～🫶"; }, 3000);
+}
+
+function loadProgress(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.journeyLog) journeyLog = data.journeyLog;
+      if (data.postcardCollection) postcardCollection = data.postcardCollection;
+      if (data.souvenirCollection) souvenirCollection = data.souvenirCollection;
+      if (data.destinationTracker) destinationTracker = data.destinationTracker;
+      if (data.fogData) { fogData = data.fogData; localStorage.setItem("yeFogData", JSON.stringify(fogData)); }
+      
+      document.getElementById("hintText").textContent = "📂 进度读取成功！小夜还记得所有旅行记忆哦～🫶";
+      updateUI();
+      switchTab('stats');
+    } catch(err) {
+      document.getElementById("hintText").textContent = "读取失败了吱...文件好像不对😣";
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ========== 启动 ==========
+// 如果有之前的旅途中被打断，重置
+if (state === STATE.IDLE) {
+  document.getElementById("hintText").textContent = "休息够了就再出发吧～等你回来吱🫶";
+}
+updateUI();
+
+// 注册 Service Worker（PWA安装支持）
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
+
+// ========== 页面可见性变化 ==========
+// 从后台切回来时保证倒计时准确
+document.addEventListener('visibilitychange', function() {
+  if (!document.hidden && (state === STATE.TRAVELING || state === STATE.FOG || state === STATE.TRAINING) && travelStartTime > 0) {
+    const elapsed = Math.floor((Date.now() - travelStartTime) / 1000);
+    timeRemaining = Math.max(0, totalTime - elapsed);
+    updateUI();
+    if (timeRemaining <= 0) {
+      clearInterval(travelTimer);
+      if (state === STATE.TRAVELING) arriveHome();
+      else if (state === STATE.FOG) fogArrive();
+      else if (state === STATE.TRAINING) freeTravelArrive();
+    }
+  }
+});
+</script>
+
+<!-- 全图查看灯箱 -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <span class="lightbox-close">&times;</span>
+  <img id="lightboxImg" src="" alt="全图">
+</div>
+
+<script>
+// ========== 灯箱（全图查看） ==========
+function openLightbox(src) {
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lightboxImg');
+  img.src = src;
+  lb.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  const lb = document.getElementById('lightbox');
+  lb.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+// ESC键关闭
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeLightbox();
+});
+
+// 阻止点击图片关闭（点击背景才关闭）
+document.getElementById('lightboxImg').addEventListener('click', function(e) {
+  e.stopPropagation();
+});
+
+function renderAlbum() {
+  var el = document.getElementById("tab-album");
+  var collected = {};
+  souvenirCollection.forEach(function(s) { collected[s.name] = true; });
+  var allItems = [];
+  destinations.forEach(function(d) {
+    d.items.forEach(function(name) {
+      allItems.push({ name: name, dest: d.name, world: d.world });
+    });
+  });
+  var grouped = {};
+  allItems.forEach(function(item) {
+    if (!grouped[item.dest]) grouped[item.dest] = { world: item.world, items: [] };
+    grouped[item.dest].items.push(item.name);
+  });
+  var htmlStr = "";
+  var destNames = Object.keys(grouped);
+  destNames.forEach(function(dest) {
+    var info = grouped[dest];
+    var collectedCount = 0;
+    info.items.forEach(function(n) { if (collected[n]) collectedCount++; });
+    var total = info.items.length;
+    var allCollected = collectedCount === total;
+    var icon = allCollected ? "\u2B50" : "\uD83C\uDF81";
+    htmlStr += "<div class=\'postcard fade-slide\'>";
+    htmlStr += "<div class=\'postcard-title\'>" + icon + " " + dest + "</div>";
+    htmlStr += "<div class=\'postcard-from\'>" + info.world + " \u00B7 " + collectedCount + "/" + total + "</div>";
+    htmlStr += "<div class=\'album-grid\'>";
+    info.items.forEach(function(name) {
+      var has = collected[name];
+      var iconPath = itemIconMap[name] || "";
+      if (has && iconPath) {
+        var fogClass = (fogData.unlocked && !fogData.completed) ? ' style="filter:grayscale(0.8)brightness(0.6);"' : '';
+        htmlStr += "<div class=\'album-item\' onclick=\'openLightbox(\"" + iconPath + "\")\'><img src=\"" + iconPath + "\" class=\'album-icon\'" + fogClass + "><span class=\'album-name\'>" + name + "</span></div>";
+      } else {
+        htmlStr += "<div class=\'album-item\'><div class=\'album-placeholder\'>?</div><span class=\'album-name missing\'>" + name + "</span></div>";
+      }
+    });
+    htmlStr += "</div></div>";
+  });
+  // 已经收集的特产
+  var souvenirNames = {};
+  souvenirCollection.forEach(function(s) { souvenirNames[s.name] = true; });
+  var collectedCount = Object.keys(souvenirNames).length;
+  
+  if (collectedCount > 0) {
+    htmlStr += '<div style="margin-top:20px;"><h3 style="color:#3a2450;font-size:16px;margin-bottom:8px;">🎁 已收集特产（' + collectedCount + '/' + allItems.length + '）</h3>';
+    htmlStr += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+    souvenirCollection.forEach(function(s) {
+      var iconPath = itemIconMap[s.name] || "";
+      if (iconPath) {
+        htmlStr += '<div style="text-align:center;width:60px;"><img src="' + iconPath + '" style="width:40px;height:40px;border-radius:6px;object-fit:contain;"><div style="font-size:10px;color:#8b7355;overflow:hidden;text-overflow:ellipsis;">' + s.name + '</div></div>';
+      }
+    });
+    htmlStr += '</div></div>';
+  }
+  
+  el.innerHTML = htmlStr;
+}
+
+// ========== 属性面板 ==========
+
+function renderStats() {
+  const el = document.getElementById("tab-stats");
+  
+  const STAT_ICONS = { str: "💪", dex: "🏃", int: "🧠", cha: "💬" };
+  
+  let html = '<div style="padding:16px;">';
+  
+  // 每个属性条
+  const stats = ["str", "dex", "int", "cha"];
+  for (const s of stats) {
+    const level = yeStats.level[s] || 1;
+    const exp = yeStats.exp[s] || 0;
+    const expToNext = (level * 100 + 50);
+    const val = getStatValue(s);
+    const pct = Math.min(100, Math.floor(exp / expToNext * 100));
+    
+    // 装备加成(显示用)
+    let bonusStr = "";
+    (yeStats.equipment || []).forEach(eq => {
+      if (eq && eq.stat === s) bonusStr += ` +${eq.bonus}(${eq.name})`;
+    });
+    const totalVal = val;
+    
+    html += `
+      <div style="margin-bottom:16px;background:#f5f0e8;border-radius:8px;padding:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span><b>${STAT_ICONS[s]} ${STAT_NAMES[s]}</b> Lv.${level}</span>
+          <span style="font-size:20px;color:#3a2450;font-weight:bold;">${totalVal}${bonusStr}</span>
+        </div>
+        <div style="margin-top:6px;height:8px;background:#ddd;border-radius:4px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#8b6bc0,#b896e0);border-radius:4px;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#8b7355;margin-top:3px;">
+          <span>经验 ${exp}/${expToNext}</span>
+        </div>
+      </div>`;
+  }
+  
+  // 迷雾模式记忆恢复进度
+  if (fogData.unlocked) {
+    const pct = fogData.memoryRestored || 0;
+    html += `
+      <div style="margin-top:16px;padding:12px;background:${fogData.completed ? '#e8f5e8' : '#f0e6d8'};border-radius:8px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:#3a2450;">
+          <span>🌫️ 记忆恢复</span>
+          <span>${pct}%</span>
+        </div>
+        <div style="margin-top:6px;height:8px;background:#ddd;border-radius:4px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:${fogData.completed ? 'linear-gradient(90deg,#6bc0a0,#8be0c0)' : 'linear-gradient(90deg,#8b6bc0,#b896e0)'};border-radius:4px;"></div>
+        </div>
+        ${fogData.completed ? '<div style="margin-top:4px;font-size:12px;color:#6a9a6a;">☀️ 所有记忆已找回！</div>' : ''}
+      </div>`;
+  }
+  
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// ========== 装备面板 ==========
+
+function renderEquipment() {
+  const el = document.getElementById("tab-equipment");
+  const STAT_ICONS = { str: "💪", dex: "🏃", int: "🧠", cha: "💬" };
+  
+  let html = '<div style="padding:16px;">';
+  
+  // 当前装备
+  html += '<div style="margin-bottom:16px;background:#f0e6d8;border-radius:8px;padding:12px;">';
+  html += '<b style="font-size:15px;color:#3a2450;">🎒 当前装备</b>';
+  const equippedItems = yeStats.equipment.filter(e => e);
+  if (equippedItems.length === 0) {
+    html += '<div style="color:#8b7355;padding:8px;font-size:14px;">还没有装备饰品呢～</div>';
+  } else {
+    for (const eq of equippedItems) {
+      const iconPath = getAccessoryIcon(eq.name);
+      html += `
+        <div style="margin-top:8px;padding:8px 12px;background:#8b6bc0;color:#fff;border-radius:8px;font-size:14px;display:flex;align-items:center;gap:8px;">
+          ${iconPath ? `<img src="${iconPath}" style="width:30px;height:30px;border-radius:4px;object-fit:contain;">` : '✅'}
+          <span>${eq.name} <span style="font-size:12px;color:#ddd;">(${STAT_ICONS[eq.stat]} ${STAT_NAMES[eq.stat]}+${eq.bonus})</span></span>
+        </div>`;
+    }
+  }
+  html += '</div>';
+  
+  // 背包
+  html += '<div style="margin-bottom:12px;"><b style="font-size:15px;color:#3a2450;">📦 背包</b></div>';
+  if (yeStats.backpack.length === 0) {
+    html += '<div style="color:#8b7355;padding:8px;font-size:14px;">还没有饰品呢～去旅行中探索吧！</div>';
+  } else {
+    html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">';
+    for (const item of yeStats.backpack) {
+      const equipped = yeStats.equipment.some(eq => eq && eq.name === item.name);
+      const iconPath = getAccessoryIcon(item.name);
+      html += `
+        <div onclick="toggleEquip('${item.name}')" style="
+          padding:8px 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;
+          background:${equipped ? '#8b6bc0' : '#f0e6d8'};color:${equipped ? '#fff' : '#2a1a3a'};
+          border:1px solid #d4b896;font-size:14px;">
+          ${iconPath ? `<img src="${iconPath}" style="width:24px;height:24px;border-radius:4px;object-fit:contain;">` : (equipped ? '✅ ' : '')}
+          <span>${item.name} <span style="font-size:12px;color:${equipped ? '#ddd' : '#8b7355'};">(${STAT_ICONS[item.stat]} ${STAT_NAMES[item.stat]}+${item.bonus})</span></span>
+        </div>`;
+    }
+    html += '</div>';
+  }
+  
+  // 装备说明
+  html += `
+    <div style="margin-top:16px;padding:12px;background:#f0e6d8;border-radius:8px;font-size:13px;color:#6a5a4a;">
+      📌 可装备2个饰品，点击切换装备/卸下
+      <br>📌 同属性效果叠加
+    </div>`;
+  
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// ========== 饰品装备/卸下 ==========
+
+function toggleEquip(name) {
+  const item = yeStats.backpack.find(i => i.name === name);
+  if (!item) return;
+  
+  const idx = yeStats.equipment.findIndex(eq => eq && eq.name === name);
+  if (idx >= 0) {
+    // 卸下
+    yeStats.equipment[idx] = null;
+  } else {
+    // 装备到第一个空位
+    const emptyIdx = yeStats.equipment.findIndex(eq => eq === null);
+    if (emptyIdx >= 0) {
+      yeStats.equipment[emptyIdx] = item;
+    } else {
+      // 替换第一个
+      yeStats.equipment[0] = item;
+    }
+  }
+  saveYeStats();
+  // 刷新当前显示的标签页
+  const activeTab = document.querySelector('.tab-content.active');
+  if (activeTab) {
+    const tabId = activeTab.id.replace('tab-', '');
+    if (tabId === 'stats') renderStats();
+    else if (tabId === 'equipment') renderEquipment();
+  }
+}
+</script>
+
+</body>
+</html>
