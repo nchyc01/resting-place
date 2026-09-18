@@ -119,7 +119,7 @@ const creationSpace = {
         }
 
         // 2026-09-18 补：《铃兰与鸢尾》条目已写好，但秘银说要先精修——所以先留开关，暂不启用
-        const LILY_READY = false; // 等秘银说“放”，改成 true 即可
+        const LILY_READY = true; // 2026-09-18 秘银同意：介绍与读后记先上；正文等他精修后再补
         if (!data.seededLily && LILY_READY) {
             const lilyHtml = [
                 '<p><strong>作者：秘银</strong> · 鼠族奇幻小说 · 约十五万字 · 六卷</p>',
