@@ -118,8 +118,9 @@ const creationSpace = {
             this.saveData(data);
         }
 
-        // 2026-09-18 补：把《铃兰与鸢尾》作为一篇正式条目放进来（作者：秘银）
-        if (!data.seededLily) {
+        // 2026-09-18 补：《铃兰与鸢尾》条目已写好，但秘银说要先精修——所以先留开关，暂不启用
+        const LILY_READY = false; // 等秘银说“放”，改成 true 即可
+        if (!data.seededLily && LILY_READY) {
             const lilyHtml = [
                 '<p><strong>作者：秘银</strong> · 鼠族奇幻小说 · 约十五万字 · 六卷</p>',
                 '<p style="margin-top:10px;">卷目：灰烬、血与火、幻灭、麦穗、放逐、传说。</p>',
