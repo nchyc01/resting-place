@@ -1,0 +1,74 @@
+/* skin-layer.css — 小夜的皮肤层（2026-09-18）
+   不改动原有样式，只在上面盖一层：换季皮肤 / 壁纸 / 窗口细节 */
+
+:root {
+    --hut-accent: #ff9cd6;
+    --hut-accent-2: #b8a2ff;
+    --hut-text: #e6e6f0;
+}
+
+body[data-skin='spring'] { --hut-accent: #a8e6a1; --hut-accent-2: #ffe6a7; --hut-text: #eaf7ea; }
+body[data-skin='summer'] { --hut-accent: #7fd7ff; --hut-accent-2: #b8f2ff; --hut-text: #e6f6ff; }
+body[data-skin='autumn'] { --hut-accent: #ffb37f; --hut-accent-2: #ffd9a0; --hut-text: #fff0e2; }
+body[data-skin='winter'] { --hut-accent: #cfe8ff; --hut-accent-2: #ffffff; --hut-text: #eef6ff; }
+body[data-skin='night']  { --hut-accent: #b48cff; --hut-accent-2: #7f9bff; --hut-text: #ded8f2; }
+
+body { color: var(--hut-text); }
+
+/* 标题与强调色跟着皮肤走 */
+h1, h2, h3, .window-title, .song-title, .icon-label { color: var(--hut-accent) !important; }
+.song-artist, .song-artist-info, small { color: var(--hut-accent-2) !important; }
+
+/* 图标悬停：一圈光 */
+.app-icon:hover, .desktop-icon:hover .icon-image {
+    box-shadow: 0 0 0 1px var(--hut-accent), 0 0 16px rgba(255, 156, 214, 0.35) !important;
+    border-radius: 12px;
+}
+
+/* 窗口：统一圆角 + 薄磨砂 + 打开时轻轻弹一下 */
+.window {
+    border-radius: 14px !important;
+    backdrop-filter: blur(6px);
+    animation: hutHop 0.18s ease-out;
+    border: 1px solid rgba(255, 156, 214, 0.25) !important;
+}
+.window-header {
+    border-radius: 14px 14px 0 0 !important;
+}
+@keyframes hutHop {
+    from { transform: scale(0.965); opacity: 0.55; }
+    to   { transform: scale(1);     opacity: 1; }
+}
+
+/* 按钮：换成皮肤的描边色 */
+button, .add-song-btn, .save-list-btn, .btn-primary, .btn-secondary, .action-btn {
+    border-color: var(--hut-accent) !important;
+}
+
+/* ---------- 壁纸（右键桌面可换） ---------- */
+body[data-wall='codelab'] { background: url('../壁纸.png') center/cover no-repeat fixed !important; }
+body[data-wall='lake']    { background: url('../travel/travel_images/blue_lake.webp') center/cover no-repeat fixed !important; }
+body[data-wall='garden']  { background: url('../travel/travel_images/queens_gardens.webp') center/cover no-repeat fixed !important; }
+body[data-wall='shrine']  { background: url('../travel/travel_images/firelink_shrine.webp') center/cover no-repeat fixed !important; }
+body[data-wall='peak']    { background: url('../travel/travel_images/crystal_peak.webp') center/cover no-repeat fixed !important; }
+
+/* ---------- 今天的小卡片 ---------- */
+#today-card {
+    position: fixed;
+    right: 18px;
+    top: 84px;
+    width: 220px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(18, 14, 30, 0.72);
+    border: 1px solid rgba(255, 156, 214, 0.28);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(8px);
+    color: var(--hut-text);
+    font-size: 12.5px;
+    line-height: 1.65;
+    z-index: 5;
+}
+#today-card .today-date { color: var(--hut-accent); font-weight: bold; letter-spacing: 0.5px; }
+#today-card img { margin-top: 10px; width: 100%; height: 96px; object-fit: cover; border-radius: 10px; }
+#today-card .today-line { margin-top: 6px; }
