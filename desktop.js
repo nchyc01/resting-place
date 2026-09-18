@@ -118,17 +118,27 @@
                 if (savedPos[app].top) el.style.top = savedPos[app].top;
             }
 
+            // 图片默认可以被浏览器原生拖拽——那会让图标"粘"在鼠标上，所以先禁掉
+            el.style.userSelect = 'none';
+            el.querySelectorAll('img').forEach(img => {
+                img.draggable = false;
+                img.style.webkitUserDrag = 'none';
+            });
+            el.addEventListener('dragstart', function (e) { e.preventDefault(); });
+
             let dragging = false, moved = false, sx = 0, sy = 0, sl = 0, st = 0;
 
-            el.addEventListener('mousedown', function (e) {
+            el.addEventListener('pointerdown', function (e) {
                 if (e.button !== 0) return;
+                e.preventDefault();
+                try { el.setPointerCapture(e.pointerId); } catch (err) {}
                 dragging = true; moved = false;
                 sx = e.clientX; sy = e.clientY;
                 sl = el.offsetLeft; st = el.offsetTop;
                 el.style.zIndex = 9998;
             });
 
-            document.addEventListener('mousemove', function (e) {
+            el.addEventListener('pointermove', function (e) {
                 if (!dragging) return;
                 const dx = e.clientX - sx, dy = e.clientY - sy;
                 if (!moved && Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
@@ -137,18 +147,21 @@
                 el.style.top = (st + dy) + 'px';
             });
 
-            document.addEventListener('mouseup', function () {
+            function endDrag(e) {
                 if (!dragging) return;
                 dragging = false;
                 el.style.zIndex = '';
+                try { if (e && e.pointerId !== undefined) el.releasePointerCapture(e.pointerId); } catch (err) {}
                 if (!moved) return;
-                // 拖过了：记住位置，并吞掉随后的那次点击（不然会顺手打开应用）
+                // 拖过了：记住位置，并吞掉随后那次点击（不然会顺手打开应用）
                 const pos = load(POS_KEY, {});
                 pos[app] = { left: el.style.left, top: el.style.top };
                 save(POS_KEY, pos);
                 window.__hutSuppressClick = true;
                 setTimeout(() => { window.__hutSuppressClick = false; }, 350);
-            });
+            }
+            el.addEventListener('pointerup', endDrag);
+            el.addEventListener('pointercancel', endDrag);
 
             el.addEventListener('contextmenu', function (e) {
                 e.preventDefault();
