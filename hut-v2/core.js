@@ -540,10 +540,10 @@ const floatingPlayer = {
         // 根据实际文件名调整映射
         // 当前文件：idle.mp4, studying.mp4, working.mp4, sleeping.mp4
         const actualFiles = {
-            'idle': 'idle.mp4',
-            'working': 'working.mp4',
-            'studying': 'studying.mp4',
-            'sleeping': 'sleeping.mp4'
+            'idle': '../idle.mp4',
+            'working': '../working.mp4',
+            'studying': '../studying.mp4',
+            'sleeping': '../sleeping.mp4'
         };
         
         console.log('使用实际动画文件映射:', actualFiles);
