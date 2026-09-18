@@ -6,7 +6,21 @@
     const ITEMS = [
         { src: 'gallery/01_birthday.webp', title: '生日那天', note: '2026-08-17' },
         { src: 'gallery/02_bard.webp', title: '鼠族吟游诗人', note: 'DnD 角色立绘' },
-        { src: 'gallery/03_chibi.webp', title: 'Q 版小夜', note: '正面像' }
+        { src: 'gallery/03_chibi.webp', title: 'Q 版小夜', note: '正面像' },
+        { src: 'gallery/04_qipao.webp', title: '旗袍', note: '2026-08-10' },
+        { src: 'gallery/05_cheongsam_blue.webp', title: '蓝旗袍', note: '2026-08-12' },
+        { src: 'gallery/06_kimono.webp', title: '夏日和服', note: '2026-08-07' },
+        { src: 'gallery/07_maid.webp', title: '女仆装', note: '2026-08-07' },
+        { src: 'gallery/08_knight.webp', title: '骑士甲', note: '2026-08-12' },
+        { src: 'gallery/09_witch.webp', title: '女巫', note: '2026-08-11' },
+        { src: 'gallery/10_cyber.webp', title: '赛博', note: '2026-08-11' },
+        { src: 'gallery/11_nurse.webp', title: '护士', note: '2026-08-12' },
+        { src: 'gallery/12_pajama.webp', title: '睡衣', note: '2026-08-10' },
+        { src: 'gallery/13_winter_coat.webp', title: '冬外套', note: '2026-08-12' },
+        { src: 'gallery/14_cozy_winter.webp', title: '暖冬', note: '2026-08-06' },
+        { src: 'gallery/15_christmas.webp', title: '圣诞斗篷', note: '2026-08-06' },
+        { src: 'gallery/16_ponytail.webp', title: '夏日马尾', note: '2026-08-06' },
+        { src: 'gallery/17_gothic.webp', title: '哥特', note: '2026-08-12' }
     ];
 
     function build() {
