@@ -37,7 +37,11 @@
         '被摸头的时候要安静。'
     ];
 
-    const IMGS = ['blue_lake', 'queens_gardens', 'firelink_shrine', 'crystal_peak', 'city_of_tears', 'anor_londo'];
+    const IMGS = [
+        'blue_lake', 'queens_gardens', 'firelink_shrine', 'crystal_peak', 'city_of_tears', 'anor_londo',
+        'hearth_hall', 'memory_hall', 'star_terrace', 'hot_spring', 'library', 'the_shire',
+        'rivendell', 'sea_of_corpses', 'sunken_city', 'abyss_edge', 'tundra', 'painted_world'
+    ];
 
     function ls(key, def) {
         try { const v = localStorage.getItem(key); return v === null ? def : v; } catch (e) { return def; }
@@ -89,6 +93,8 @@
         applySkin();
         applyWall();
         fillToday();
+        const card = document.getElementById('today-card');
+        if (card) card.addEventListener('click', fillToday); // 点一下换一张
         setInterval(applySkin, 600000); // 每十分钟看一眼要不要昼/夜切换
         console.log('小夜版皮肤层就绪');
     });
