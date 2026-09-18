@@ -4,6 +4,8 @@
 (function () {
     const POS_KEY = 'hut-icon-pos-v1';
     const PIN_KEY = 'hut-pinned-v1';
+    const GRID_KEY = 'hut-grid-on-v1';
+    const GRID_X = 96, GRID_Y = 112;
     const DEFAULT_PINNED = ['welcome', 'music'];
 
     // 应用清单（和桌面图标对应）
@@ -27,6 +29,14 @@
     }
     function save(key, val) {
         try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
+    }
+
+    function gridOn() {
+        const v = load(GRID_KEY, null);
+        return v === null ? true : !!v;
+    }
+    function snapTo(v, size) {
+        return Math.max(0, Math.round(v / size) * size);
     }
 
     function getPinned() {
@@ -120,9 +130,11 @@
 
             // 图片默认可以被浏览器原生拖拽——那会让图标"粘"在鼠标上，所以先禁掉
             el.style.userSelect = 'none';
+            el.style.touchAction = 'none';
             el.querySelectorAll('img').forEach(img => {
                 img.draggable = false;
                 img.style.webkitUserDrag = 'none';
+                img.style.pointerEvents = 'none';
             });
             el.addEventListener('dragstart', function (e) { e.preventDefault(); });
 
@@ -136,6 +148,7 @@
                 sx = e.clientX; sy = e.clientY;
                 sl = el.offsetLeft; st = el.offsetTop;
                 el.style.zIndex = 9998;
+                el.style.opacity = '0.85';
             });
 
             el.addEventListener('pointermove', function (e) {
@@ -151,9 +164,14 @@
                 if (!dragging) return;
                 dragging = false;
                 el.style.zIndex = '';
+                el.style.opacity = '';
                 try { if (e && e.pointerId !== undefined) el.releasePointerCapture(e.pointerId); } catch (err) {}
                 if (!moved) return;
-                // 拖过了：记住位置，并吞掉随后那次点击（不然会顺手打开应用）
+                // 拖过了：先按网格吸附，再记住位置，并吞掉随后那次点击
+                if (gridOn()) {
+                    el.style.left = snapTo(el.offsetLeft, GRID_X) + 'px';
+                    el.style.top = snapTo(el.offsetTop, GRID_Y) + 'px';
+                }
                 const pos = load(POS_KEY, {});
                 pos[app] = { left: el.style.left, top: el.style.top };
                 save(POS_KEY, pos);
@@ -201,6 +219,10 @@
                 if (e.target.closest && e.target.closest('.desktop-icon')) return;
                 e.preventDefault();
                 showMenu(e.clientX, e.clientY, [
+                    {
+                        label: '网格对齐：' + (gridOn() ? '已开（点一下关掉）' : '已关（点一下打开）'),
+                        fn: () => { save(GRID_KEY, !gridOn()); }
+                    },
                     {
                         label: '重置所有图标位置',
                         fn: () => { save(POS_KEY, {}); location.reload(); }
