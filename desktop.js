@@ -17,7 +17,8 @@
         memory:   { title: '记忆库',   icon: 'assets/memory_50x50.png' },
         about:    { title: '关于小夜', icon: 'assets/profile_50x50.png' },
         creation: { title: '创作空间', icon: 'assets/creation_50x50.png' },
-        travel:   { title: '出门旅行', icon: 'travel/travel_images/blue_lake.webp', round: true }
+        travel:   { title: '出门旅行', icon: 'travel/travel_images/blue_lake.webp', round: true },
+        gallery:  { title: '画廊',     icon: 'gallery/01_birthday.webp', round: true }
     };
 
     function load(key, def) {

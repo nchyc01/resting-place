@@ -7,7 +7,7 @@
     
     <!-- CSS文件 -->
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="skin-layer.css?v=2">
+    <link rel="stylesheet" href="skin-layer.css?v=3">
     
     <!-- 预加载图标 -->
     <link rel="preload" href="assets/home_50x50.png" as="image">
@@ -88,6 +88,13 @@
                     </div>
                     <div class="icon-label">出门旅行</div>
                 </div>
+
+                <div class="desktop-icon" style="top: 150px; left: 250px;" data-app="gallery">
+                    <div class="icon-image">
+                        <img src="gallery/01_birthday.webp" alt="画廊" style="width: 50px; height: 50px; border-radius: 10px; object-fit: cover;">
+                    </div>
+                    <div class="icon-label">画廊</div>
+                </div>
                 
                 <!-- 窗口容器 -->
                 <div id="windows-container">
@@ -134,6 +141,7 @@
     <script src="creation-space.js"></script>
 <script src="desktop.js?v=4"></script>
 <script src="skins.js?v=1"></script>
+    <script src="gallery.js"></script>
     
     <!-- 初始化脚本 -->
     <script>
@@ -153,7 +161,6 @@
             
             // 初始化关于页面
             initAboutPage();
-            
             // 初始化欢迎页面
             initWelcomePage();
             
