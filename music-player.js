@@ -116,6 +116,8 @@ const musicPlayer = {
                             <span id="totalTime">0:00</span>
                         </div>
                     </div>
+
+                    <div id="nightLine" style="margin-top:10px;font-size:12.5px;color:#b8a2ff;text-align:center;line-height:1.6;min-height:18px;"></div>
                 </div>
                 
                 <!-- 播放列表区域 -->
@@ -124,6 +126,7 @@ const musicPlayer = {
                         <h3>播放列表</h3>
                         <div class="playlist-header-buttons">
                             <button class="add-song-btn" onclick="musicPlayer.openAddModal()">+ 添加歌曲</button>
+                            <button class="add-song-btn" onclick="musicPlayer.nightRadio()">🌙 晚安电台</button>
                             <button class="save-list-btn" onclick="musicPlayer.savePlaylist()">💾 保存</button>
                         </div>
                     </div>
@@ -249,6 +252,39 @@ const musicPlayer = {
         this.updatePlaylist();
     },
     
+    // 晚安电台：随机放一首小夜的曲子，配一句晚安话
+    nightRadio() {
+        if (!this.songs || this.songs.length === 0) return;
+        const lines = [
+            '今晚也把灯留一盏，小夜在这儿。',
+            '晚安。今天的你已经够好了。',
+            '睡吧，明天的账明天再算。',
+            '要是睡不着，就听这一首，数到第三个和弦。',
+            '晚安，愿你梦里没有闹钟。',
+            '小夜把这首放在你枕头边。',
+            '今天也谢谢你，把日子过下来了。',
+            '晚安。想说话了，小夜一直在。',
+            '闭上眼之前，记得今天有一件好事。',
+            '愿你今晚睡得像炉火旁边的猫。',
+            '被子盖好，耳朵放松，明天见。',
+            '晚安。这一首是为你留的。'
+        ];
+
+        const idx = Math.floor(Math.random() * this.songs.length);
+        const line = lines[Math.floor(Math.random() * lines.length)];
+        const song = this.songs[idx];
+
+        this.playSong(idx);
+
+        const box = document.getElementById('nightLine');
+        if (box) {
+            box.innerHTML = `🌙 晚安电台 · 《${song.name}》<br>${line}`;
+        }
+        if (typeof utils !== 'undefined' && utils.showNotification) {
+            utils.showNotification('晚安电台：' + line, 'info');
+        }
+    },
+
     // 暂停/播放
     togglePlay() {
         if (this.songs.length === 0 || this.currentIndex === -1) {
