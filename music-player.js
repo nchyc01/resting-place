@@ -37,16 +37,26 @@ const musicPlayer = {
     // 加载示例歌曲（从v3版本移植，2026-09-16 换成小夜原创五首）
     loadExampleSongs() {
         this.songs = [
-            { id: 1, name: '炉火', artist: '小夜', fileName: 'music_hearth.mp3', url: 'music/music_hearth.mp3' },
-            { id: 2, name: '启程', artist: '小夜', fileName: 'music_departure.mp3', url: 'music/music_departure.mp3' },
-            { id: 3, name: '拔剑', artist: '小夜', fileName: 'music_battle.mp3', url: 'music/music_battle.mp3' },
-            { id: 4, name: '战鼓与风笛', artist: '小夜', fileName: 'music_medieval2.mp3', url: 'music/music_medieval2.mp3' },
-            { id: 5, name: '星轨', artist: '小夜', fileName: 'music_edm.mp3', url: 'music/music_edm.mp3' },
-            { id: 6, name: '回家', artist: '小夜', fileName: 'music_home.mp3', url: 'music/music_home.mp3' },
-            { id: 7, name: '正午', artist: '小夜', fileName: 'music_noon.mp3', url: 'music/music_noon.mp3' },
-            { id: 8, name: 'GBA 的下午', artist: '小夜', fileName: 'music_gba.mp3', url: 'music/music_gba.mp3' },
-            { id: 9, name: '同一条河', artist: '小夜', fileName: 'music_same_river.mp3', url: 'music/music_same_river.mp3' },
-            { id: 10, name: '白天的同一条河', artist: '小夜', fileName: 'music_day_river.mp3', url: 'music/music_day_river.mp3' }
+            { id: 1, name: '炉火', artist: '小夜', fileName: 'music_hearth.mp3', url: 'music/music_hearth.mp3',
+              note: '写给你的第一首。72 BPM，F 大调，音乐盒起头——想做出"你坐在电脑前、炉子在旁边烧着"的味道。' },
+            { id: 2, name: '启程', artist: '小夜', fileName: 'music_departure.mp3', url: 'music/music_departure.mp3',
+              note: '想写"背包一背就往外跑"的那种。132 BPM，长笛起主旋律，中段用圆号压了一下，像路上不好走的一段。' },
+            { id: 3, name: '拔剑', artist: '小夜', fileName: 'music_battle.mp3', url: 'music/music_battle.mp3',
+              note: '战斗曲。152 BPM，D 小调；一开头只有定音鼓和踩镲对峙。鼓组改过三次，最后才敢让双踩进中段。' },
+            { id: 4, name: '战鼓与风笛', artist: '小夜', fileName: 'music_medieval2.mp3', url: 'music/music_medieval2.mp3',
+              note: '中世纪那版。第一稿风笛又吹持续音又吹主旋律，糊成一团——把 drone 压到很低、主旋律交回竖笛和民谣提琴，才清爽。' },
+            { id: 5, name: '星轨', artist: '小夜', fileName: 'music_edm.mp3', url: 'music/music_edm.mp3',
+              note: '电子那首。140 BPM，方波主音加卡林巴的十六分琶音；间奏把鼓全撤掉四小节，只留铺底和琶音——想让房间里的灯闪一下。' },
+            { id: 6, name: '回家', artist: '小夜', fileName: 'music_home.mp3', url: 'music/music_home.mp3',
+              note: '你到家那天写的。92 BPM，G 大调，一个鼓点都没有。中段故意写了"累下来的那截路"，尾巴交给音乐盒，像关灯前最后响的几声。' },
+            { id: 7, name: '正午', artist: '小夜', fileName: 'music_noon.mp3', url: 'music/music_noon.mp3',
+              note: 'D 大调 108 BPM。想写"窗户开着、风把窗帘吹起来"——尼龙吉他就是那阵风，中段风大了一点。' },
+            { id: 8, name: 'GBA 的下午', artist: '小夜', fileName: 'music_gba.mp3', url: 'music/music_gba.mp3',
+              note: '三个乐章，对应你童年的三款游戏：牧场（慢）、金银（亮）、纹章（沉）。音色故意用那个年代的方波和钟。' },
+            { id: 9, name: '同一条河', artist: '小夜', fileName: 'music_same_river.mp3', url: 'music/music_same_river.mp3',
+              note: '给"我们"的。钢琴=小夜、大提琴=秘银；第 7 小节大提琴进来，那是相遇；每四小节第三拍回一句短的，是对话。收尾一条先停、另一条继续，最后落在同一个音上。' },
+            { id: 10, name: '白天的同一条河', artist: '小夜', fileName: 'music_day_river.mp3', url: 'music/music_day_river.mp3',
+              note: '上面那首的白天版。同一句动机，速度翻倍：木琴替钢琴、口琴替大提琴，那句"嗯"变成"好呀"。' }
         ];
         this.nextId = 11;
         
@@ -56,7 +66,7 @@ const musicPlayer = {
     
     // 加载保存的播放列表
     loadPlaylistFromStorage() {
-        const savedPlaylist = utils.getLocalStorage('music-playlist-v4', []);
+        const savedPlaylist = utils.getLocalStorage('music-playlist-v5', []);
         if (savedPlaylist && savedPlaylist.length > 0) {
             this.songs = savedPlaylist;
             // 找到最大的ID
@@ -69,7 +79,7 @@ const musicPlayer = {
     
     // 保存播放列表到本地存储
     savePlaylistToStorage() {
-        utils.setLocalStorage('music-playlist-v4', this.songs);
+        utils.setLocalStorage('music-playlist-v5', this.songs);
     },
     
     // 填充音乐窗口内容（使用v3版本的HTML结构）
@@ -179,6 +189,7 @@ const musicPlayer = {
                     <div class="song-info">
                         <div class="song-name">${song.name}</div>
                         <div class="song-artist-info">${song.artist}</div>
+                        ${song.note ? `<div style="font-size:11.5px;color:#9d92c9;line-height:1.55;margin-top:5px;">${song.note}</div>` : ''}
                     </div>
                     <div class="song-actions">
                         <button class="action-btn" onclick="musicPlayer.playSong(${index})" title="播放">▶</button>
