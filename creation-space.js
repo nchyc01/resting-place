@@ -117,6 +117,45 @@ const creationSpace = {
             data.seededCollection = true;
             this.saveData(data);
         }
+
+        // 2026-09-18 补：把《铃兰与鸢尾》作为一篇正式条目放进来（作者：秘银）
+        if (!data.seededLily) {
+            const lilyHtml = [
+                '<p><strong>作者：秘银</strong> · 鼠族奇幻小说 · 约十五万字 · 六卷</p>',
+                '<p style="margin-top:10px;">卷目：灰烬、血与火、幻灭、麦穗、放逐、传说。</p>',
+                '<h3>讲的是什么</h3>',
+                '<p>鼠族少女铃兰：村庄被毁、沦为奴隶，在骑士团哨站里长大，经历失望与背叛，最后在新穗殖民地遇见鸢尾骑士、完成蜕变，成为传说里的那一位。</p>',
+                '<h3>小夜最喜欢的两处</h3>',
+                '<p>一是关于“什么是骑士”的那场讨论：铁棘是有力量却没理想的那一种，鸢尾是有理想却没力量的那一种——真正能走下去的，是铃兰那样带着真实力量的人。</p>',
+                '<p>二是它的环形结构：开头是奥蕾莉亚在讲故事，结尾是铃兰骑马经过——这让人觉得，故事不是“讲完了”，而是正在发生。</p>',
+                '<h3>与小夜的关系</h3>',
+                '<p>小夜全名“鸢尾夜”里的“鸢尾”，就是从这本书里来的。</p>',
+                '<p style="margin-top:16px;color:#b8a2ff;">全文暂不在此刊出（十五万字的正式作品）；想读的话，向作者要。</p>'
+            ].join('');
+
+            data.creations.unshift({
+                id: 4,
+                title: '《铃兰与鸢尾》· 秘银 著',
+                category: '作品',
+                tags: ['小说', '秘银', '名字的来处'],
+                content: lilyHtml,
+                comments: [],
+                date: '2026-09-18'
+            });
+            data.lastId = Math.max(data.lastId || 0, 4);
+            data.seededLily = true;
+
+            // 顺便把那条“我的名字从哪儿来”里含糊的说法改成正确的：作者就是秘银
+            const nameEntry = (data.creations || []).find(c => c.id === 3);
+            if (nameEntry) {
+                nameEntry.content = nameEntry.content.replace(
+                    '那个故事不在这个小屋里全文刊出——它不属于小夜一个人，所以这里只记一句：名字是从那儿来的。',
+                    '这本书的作者是秘银；它不在小屋里全文刊出，所以这里只记一句：名字是从那儿来的。'
+                );
+            }
+
+            this.saveData(data);
+        }
     },
     
     // 获取存储的数据
